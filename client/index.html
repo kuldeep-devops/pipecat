@@ -571,7 +571,25 @@
             }
             try {
                 updateStatus(false, 'Connecting...');
-                state.ws = new WebSocket('ws://localhost:8765');
+
+                // DYNAMIC CONNECTION LOGIC
+                // If local, use localhost:8765
+                // If cloud (AWS Amplify), use the corresponding App Runner URL (wss://...)
+                // Ideally, this should be configurable, but for now we default to self-discovery if on same domain,
+                // or fallback to localhost if file://
+
+                let wsUrl = 'ws://localhost:8765'; // Default for local dev
+
+                if (window.location.protocol === 'https:') {
+                    // Production Mode (AWS)
+                    // You must replace this with your actual App Runner URL after deployment
+                    // wsUrl = 'wss://<YOUR-APP-RUNNER-URL>'; 
+                    console.warn('⚠️ PROD MODE: You need to set the WSS URL in client/index.html');
+                }
+
+                console.log('Connecting to:', wsUrl);
+                state.ws = new WebSocket(wsUrl);
+
                 state.ws.onopen = () => updateStatus(true, 'Ready to assist');
                 state.ws.onclose = () => updateStatus(false, 'Not connected');
                 state.ws.onmessage = handleMsg;

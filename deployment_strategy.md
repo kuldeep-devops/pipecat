@@ -19,6 +19,22 @@ We will containerize the Python backend and deploy it to App Runner. App Runner 
     -   **Env Vars**: Add DEEPGRAM_API_KEY, OPENAI_API_KEY, ELEVENLABS_API_KEY.
 4.  **Result**: You get a secure URL like `wss://your-app-id.awsapprunner.com`.
 
+### Local Verification (Optional but Recommended)
+Before deploying, you can build and run the Docker container locally to ensure everything is packaged correctly.
+
+**Build the image:**
+```bash
+docker build -t healthcare-assistant-backend .
+```
+
+**Run the container:**
+(Make sure to pass your API keys!)
+```bash
+docker run -p 8765:8765 \
+  --env-file .env \
+  healthcare-assistant-backend
+```
+
 ## 2. Frontend Deployment (AWS Amplify)
 Amplify is the easiest way to host the static `client/index.html` and assets.
 
