@@ -50,6 +50,15 @@ This guide is designed for anyone to deploy the **HealthCare Voice Assistant** t
 1.  **Source**: Select "Container registry".
 2.  **Provider**: Select "Amazon ECR".
 3.  **Image URI**: Browse and select your image tag (e.g., `latest`).
+    > [!WARNING]
+    > **Mac Users (M1/M2/M3)**: You **MUST** build your image for the cloud architecture (Intel/AMD), or it will fail silently.
+    >
+    > Run this command to build correctly:
+    > ```bash
+    > docker build --platform linux/amd64 -t healthcare-assistant-backend .
+    > ```
+    > Then push this new image to ECR.
+
 4.  **Deployment settings**: "Automatic" (if you want auto-deploy on new images) or "Manual".
 5.  **Configuration**:
     *   **Port**: `8765`
