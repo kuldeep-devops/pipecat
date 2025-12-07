@@ -1,78 +1,109 @@
-# ☁️ AWS Deployment Strategy
+# 🚀 AWS Deployment Guide (Step-by-Step)
 
-## Overview
-We will deploy the application using modern, managed services to minimize maintenance and ensure security (SSL/TLS) is handled automatically.
+This guide is designed for anyone to deploy the **HealthCare Voice Assistant** to the cloud. You do not need to be a developer to follow these steps.
 
--   **Backend**: AWS App Runner (Serverless container runner)
--   **Frontend**: AWS Amplify (Static site hosting)
--   **Database**: None (Stateless)
+---
 
-## 1. Backend Deployment (AWS App Runner)
-We will containerize the Python backend and deploy it to App Runner. App Runner automatically handles load balancing and SSL (HTTPS/WSS) endpoints.
+## ✅ Prerequisites
+1.  **AWS Account**: Login to [aws.amazon.com](https://aws.amazon.com).
+2.  **GitHub Account**: Ensure this code is pushed to your GitHub repository.
+3.  **API Keys**: Have your `DEEPGRAM_API_KEY`, `OPENAI_API_KEY`, and `ELEVENLABS_API_KEY` ready.
 
-### Steps:
-1.  **Dockerize**: Create a `Dockerfile` for the python server.
-2.  **Push**: Push the code to a GitHub repository.
-3.  **Deploy**: Connect AWS App Runner to the GitHub repo.
-    -   **Runtime**: Python 3.10+ (or use the Dockerfile mode).
-    -   **Port**: 8765
-    -   **Env Vars**: Add DEEPGRAM_API_KEY, OPENAI_API_KEY, ELEVENLABS_API_KEY.
-4.  **Result**: You get a secure URL like `wss://your-app-id.awsapprunner.com`.
+---
 
-### Local Verification (Optional but Recommended)
-Before deploying, you can build and run the Docker container locally to ensure everything is packaged correctly.
+## Part 1: Deploy Backend (AWS App Runner)
+*This runs the "Brain" of the AI (Python Server).*
 
-**Build the image:**
-```bash
-docker build -t healthcare-assistant-backend .
-```
+1.  **Go to AWS App Runner**: Search for "App Runner" in the AWS search bar.
+2.  **Click "Create service"**.
+3.  **Source & Repository**:
+    *   **Repository type**: Select "Source code repository".
+    *   **Provider**: Select "GitHub" (Connect your account if needed).
+    *   **Repository**: Select your `healthcare-voice-assistant` repo.
+    *   **Branch**: Select `main`.
+    *   **Deployment settings**: Select "Automatic" (so it updates when you push code).
+    *   Click **Next**.
+4.  **Configure Build**:
+    *   **Configuration file**: Select "Configure all settings here".
+    *   **Runtime**: Select `Python 3.10`.
+    *   **Build command**: `pip install -r requirements.txt`
+    *   **Start command**: `python main.py`
+    *   **Port**: `8765` (Important! Change default 8080 to 8765).
+    *   Click **Next**.
+5.  **Configure Service**:
+    *   **Service name**: Enter `healthcare-backend`.
+    *   **Environment variables** (Click "Add environment variable"):
+        *   Key: `DEEPGRAM_API_KEY` | Value: `your_key_here`
+        *   Key: `OPENAI_API_KEY`   | Value: `your_key_here`
+        *   Key: `ELEVENLABS_API_KEY`| Value: `your_key_here`
+    *   *(Optional)* **Auto scaling**: Leave defaults.
+    *   *(Optional)* **Health check**: Leave defaults.
+    *   Click **Next**, then **Create & Deploy**.
+6.  **Wait**: It will take 5-10 minutes.
+7.  **Copy URL**: Once active, copy the "Default domain" (e.g., `https://xyz.awsapprunner.com`). 
+    *   **Note**: We need the **WSS** version. Just replace `https://` with `wss://`.
+    *   Example: `wss://xyz.awsapprunner.com` -> **SAVE THIS URL!**
 
-**Run the container:**
-(Make sure to pass your API keys!)
-```bash
-docker run -p 8765:8765 \
-  --env-file .env \
-  healthcare-assistant-backend
-```
+### (Alternative) Part 1: Deploy from ECR Image
+*If you already have a Docker image in Amazon ECR:*
 
-## 2. Frontend Deployment (AWS Amplify)
-Amplify is the easiest way to host the static `client/index.html` and assets.
+1.  **Source**: Select "Container registry".
+2.  **Provider**: Select "Amazon ECR".
+3.  **Image URI**: Browse and select your image tag (e.g., `latest`).
+4.  **Deployment settings**: "Automatic" (if you want auto-deploy on new images) or "Manual".
+5.  **Configuration**:
+    *   **Port**: `8765`
+    *   **Start command**: Leave empty (it uses the Dockerfile's CMD).
+    *   **Environment variables**: Same as above (Add your 3 API keys).
+    *   Proceed to deploy.
 
-### Steps:
-1.  **Preparation**: Ensure `client/index.html` uses the production WebSocket URL (we will make this configurable).
-2.  **Deploy**:
-    -   Go to AWS Amplify Console.
-    -   "Host a web app" -> Connect GitHub.
-    -   Point to the `client` folder.
-3.  **Result**: You get a secure URL like `https://main.app-id.amplifyapp.com`.
+---
 
-## 3. Required Code Changes
-### Dockerfile
-We need to add a `Dockerfile` to the root directory to define the backend environment.
+## Part 2: Deploy Frontend (AWS Amplify)
+*This hosts the "Website" (UI) that you see in the browser.*
 
-### Frontend Configuration (Injecting URL)
-Since `client/index.html` is a static file, we cannot read environment variables at runtime. Instead, we use a placeholder `__WEBSOCKET_URL__` and replace it during the build process.
+1.  **Go to AWS Amplify**: Search for "Amplify" in AWS.
+2.  **Click "Create new app"** -> "GitHub".
+3.  **Connect Repo**:
+    *   Select your `healthcare-voice-assistant` repo and `main` branch.
+    *   Click **Next**.
+4.  **Build Settings** (The detailed part):
+    *   **App name**: `healthcare-frontend`.
+    *   **Frontend build command**: Leave blank (or type `echo "Skip"`).
+    *   **Build output directory**: Type `client`.
+    *   **IMPORTANT**: Click the **"Edit YML file"** button.
+    *   **Replace everything** with this code:
+        ```yaml
+        version: 1
+        frontend:
+          phases:
+            build:
+              commands:
+                - sed -i "s|__WEBSOCKET_URL__|$WEBSOCKET_URL|g" client/index.html
+          artifacts:
+            baseDirectory: client
+            files:
+              - '**/*'
+        ```
+    *   Click **Save** inside the editor.
+    *   Click **Next**.
+5.  **Review & Create**:
+    *   Click **Save and deploy**.
+6.  **Configure Environment Variable** (Connect the Frontend to Backend):
+    *   **WAIT** for the first deployment (it might fail or simple work but point to localhost).
+    *   Go to **App settings** (left menu) -> **Environment variables**.
+    *   Click **Manage variables**.
+    *   Add a variable:
+        *   **Key**: `WEBSOCKET_URL`
+        *   **Value**: Paste the **WSS URL** from Part 1 (e.g., `wss://xyz.awsapprunner.com`).
+    *   Click **Save**.
+7.  **Re-deploy**:
+    *   Go back to the main app page.
+    *   Click **"Redeploy this version"**.
+    *   *Reason*: The environment variable only takes effect during the build process, so we need to run the build again.
 
-**In AWS Amplify Console:**
-1.  Go to **Environment variables**.
-2.  Add a variable:
-    -   Key: `WEBSOCKET_URL`
-    -   Value: `wss://<your-app-runner-url>` (e.g., `wss://xyz.awsapprunner.com`)
+---
 
-3.  Go to **Build settings**.
-4.  Add this command to the `preBuild` or `build` phase in `amplify.yml`:
-    ```yaml
-    - sed -i "s|__WEBSOCKET_URL__|$WEBSOCKET_URL|g" client/index.html
-    ```
-    *(This command finds the placeholder string and replaces it with your actual environment variable value).*
-
-## Cost Estimates (Rough)
--   **App Runner**: ~$5/month (requests) + provisioned instances (pauses when idle in some configs, but persistent connection needs active instance). ~$25/month for 1 active instance 24/7.
--   **Amplify**: Free tier eligible (generous limits).
-
-## Alternative: EC2 (Cheaper, More Manual)
-If you prefer a lower cost (Free Tier eligible) but more manual setup:
-1.  Launch **t3.micro** instance.
-2.  Install Docker.
-3.  Run the container.
-4.  Install **Caddy** or **Nginx** for SSL (critical for microphone permission).
+## ✅ Setup Complete!
+Open the **Amplify Domain** (e.g., `https://main.xyz.amplifyapp.com`).
+Your Voice Assistant is now live and talking to your cloud backend! 🎤☁️
