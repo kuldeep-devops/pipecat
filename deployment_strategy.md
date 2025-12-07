@@ -1,0 +1,56 @@
+# ☁️ AWS Deployment Strategy
+
+## Overview
+We will deploy the application using modern, managed services to minimize maintenance and ensure security (SSL/TLS) is handled automatically.
+
+-   **Backend**: AWS App Runner (Serverless container runner)
+-   **Frontend**: AWS Amplify (Static site hosting)
+-   **Database**: None (Stateless)
+
+## 1. Backend Deployment (AWS App Runner)
+We will containerize the Python backend and deploy it to App Runner. App Runner automatically handles load balancing and SSL (HTTPS/WSS) endpoints.
+
+### Steps:
+1.  **Dockerize**: Create a `Dockerfile` for the python server.
+2.  **Push**: Push the code to a GitHub repository.
+3.  **Deploy**: Connect AWS App Runner to the GitHub repo.
+    -   **Runtime**: Python 3.10+ (or use the Dockerfile mode).
+    -   **Port**: 8765
+    -   **Env Vars**: Add DEEPGRAM_API_KEY, OPENAI_API_KEY, ELEVENLABS_API_KEY.
+4.  **Result**: You get a secure URL like `wss://your-app-id.awsapprunner.com`.
+
+## 2. Frontend Deployment (AWS Amplify)
+Amplify is the easiest way to host the static `client/index.html` and assets.
+
+### Steps:
+1.  **Preparation**: Ensure `client/index.html` uses the production WebSocket URL (we will make this configurable).
+2.  **Deploy**:
+    -   Go to AWS Amplify Console.
+    -   "Host a web app" -> Connect GitHub.
+    -   Point to the `client` folder.
+3.  **Result**: You get a secure URL like `https://main.app-id.amplifyapp.com`.
+
+## 3. Required Code Changes
+### Dockerfile
+We need to add a `Dockerfile` to the root directory to define the backend environment.
+
+### Frontend Config
+We need to update `client/index.html` to not hardcode `localhost`.
+**Proposed Change**:
+```javascript
+// client/index.html
+const WS_URL = window.location.hostname === 'localhost' 
+    ? 'ws://localhost:8765' 
+    : 'wss://<YOUR-APP-RUNNER-URL>'; // You will update this after backend deployment
+```
+
+## Cost Estimates (Rough)
+-   **App Runner**: ~$5/month (requests) + provisioned instances (pauses when idle in some configs, but persistent connection needs active instance). ~$25/month for 1 active instance 24/7.
+-   **Amplify**: Free tier eligible (generous limits).
+
+## Alternative: EC2 (Cheaper, More Manual)
+If you prefer a lower cost (Free Tier eligible) but more manual setup:
+1.  Launch **t3.micro** instance.
+2.  Install Docker.
+3.  Run the container.
+4.  Install **Caddy** or **Nginx** for SSL (critical for microphone permission).

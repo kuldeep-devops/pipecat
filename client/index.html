@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthCare Plus - AI Assistant</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            /* Indigo */
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            /* Pink/Rose for Record */
+            --bg-color: #7c3aed;
+            /* Deep Purple Background */
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --surface: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --user-msg-bg: #dbeafe;
+            /* Blueish */
+            --ai-msg-bg: #dcfce7;
+            /* Greenish */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-main);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--surface);
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+
+        /* --- Header --- */
+        .header {
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            padding: 24px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* --- Scrollable Content --- */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Quick Start Info */
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #1e40af;
+            line-height: 1.4;
+        }
+
+        /* Status Check */
+        .status-box {
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .status-box.connected {
+            background: #f0fdf4;
+            border-color: #dcfce7;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--danger);
+            margin: 0 auto 8px auto;
+            box-shadow: 0 0 0 4px #fee2e2;
+            transition: all 0.3s;
+        }
+
+        .status-box.connected .status-dot {
+            background: var(--success);
+            box-shadow: 0 0 0 4px #d1fae5;
+        }
+
+        .status-text {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--danger);
+            margin-bottom: 2px;
+        }
+
+        .status-box.connected .status-text {
+            color: var(--success);
+        }
+
+        .status-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Mode Switcher */
+        .mode-group {
+            display: flex;
+            background: #f3f4f6;
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .mode-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Audio Visualizer Bar */
+        .visualizer-container {
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        .vis-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .vis-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .vis-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--success);
+            transition: width 0.1s;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #f3f4f6;
+        }
+
+        .stat-val {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Settings Toggle */
+        .settings-toggle {
+            width: 100%;
+            text-align: left;
+            background: white;
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        .settings-panel {
+            display: none;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: -10px;
+        }
+
+        .settings-panel.open {
+            display: block;
+        }
+
+        .slider-row {
+            margin-bottom: 12px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 4px;
+        }
+
+        /* Actions */
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-connect {
+            background: #4f46e5;
+        }
+
+        .btn-record {
+            background: #f43f5e;
+            box-shadow: 0 4px 6px -1px rgba(244, 63, 94, 0.3);
+        }
+
+        .btn-record.recording {
+            background: #be123c;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+            }
+        }
+
+        /* Chat Log */
+        .chat-log {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border-top: 2px solid #f3f4f6;
+            padding-top: 20px;
+        }
+
+        .msg {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 90%;
+        }
+
+        .msg-meta {
+            font-size: 10px;
+            margin-bottom: 4px;
+            font-weight: 700;
+            opacity: 0.7;
+        }
+
+        .msg.ai {
+            align-self: flex-start;
+            background: var(--ai-msg-bg);
+            color: #064e3b;
+            border-left: 3px solid #10b981;
+        }
+
+        .msg.user {
+            align-self: flex-end;
+            background: var(--user-msg-bg);
+            color: #1e3a8a;
+            border-right: 3px solid #3b82f6;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1><span>🏥</span> HealthCare Plus</h1>
+            <p>AI-Powered Voice Assistant</p>
+        </div>
+
+        <div class="content" id="scrollArea">
+
+            <!-- Info -->
+            <div class="info-box">
+                💡 <strong>Quick Start:</strong> Connect to server, choose your mode (Hands-Free or Manual), and start
+                talking! The system will automatically transcribe and respond.
+            </div>
+
+            <!-- Status -->
+            <div class="status-box" id="statusBox">
+                <div class="status-dot"></div>
+                <div class="status-text" id="statusText">Disconnected</div>
+                <div class="status-sub" id="statusSub">Not connected</div>
+            </div>
+
+            <!-- Mode -->
+            <div class="mode-group">
+                <button class="mode-btn active" data-mode="auto" onclick="setMode('auto')">🎯 Auto-Stop (Hands
+                    Free)</button>
+                <button class="mode-btn" data-mode="manual" onclick="setMode('manual')">👆 Manual
+                    (Push-to-Talk)</button>
+            </div>
+
+            <!-- Audio Level -->
+            <div class="visualizer-container">
+                <div class="vis-label">Audio Level Monitor <span id="visVal">0%</span></div>
+                <div class="vis-bar-bg">
+                    <div class="vis-bar-fill" id="visFill"></div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-val" id="chunkCount">0</div>
+                    <div class="stat-label">Audio Chunks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="timeVal">0.0s</div>
+                    <div class="stat-label">Recording Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="convCount">0</div>
+                    <div class="stat-label">Conversations</div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <button class="settings-toggle" onclick="toggleSettings()">
+                <span>⚙️ Advanced Settings</span>
+                <span>▼</span>
+            </button>
+            <div class="settings-panel" id="settingsPanel">
+                <div class="slider-row">
+                    <div class="slider-header"><span>Silence Timeout</span><span id="silenceVal">500ms</span></div>
+                    <input type="range" id="silenceSlider" min="200" max="2000" step="100" value="500">
+                </div>
+                <div class="slider-row">
+                    <div class="slider-header"><span>Min Recording</span><span id="minRecordVal">2.0s</span></div>
+                    <input type="range" id="minRecordSlider" min="500" max="5000" step="500" value="2000">
+                </div>
+                <div class="slider-row">
+                    <div class="slider-header"><span>Sensitivity</span><span id="sensVal">Medium</span></div>
+                    <input type="range" id="sensitivitySlider" min="1" max="5" step="1" value="3">
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="action-group">
+                <button class="btn btn-connect" id="connectBtn" onclick="toggleConnection()">
+                    🔌 Connect to Server
+                </button>
+                <button class="btn btn-record" id="recordBtn" disabled>
+                    🎤 Hold to Record
+                </button>
+            </div>
+
+            <!-- Logic Log -->
+            <div class="chat-log" id="chatLog">
+                <!-- Msgs -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- APP STATE ---
+        const state = {
+            ws: null, audioContext: null, mediaStream: null, processor: null,
+            recording: false, mode: 'auto',
+            audioChunks: [], currentAudioSource: null, audioStartTime: 0,
+            // Settings
+            silenceThreshold: 10, minChunksBeforeStop: 40, loudChunksToStart: 3, volumeThreshold: 0.005,
+            // Parsed Settings
+            stats: { chunks: 0, convs: 0 },
+            // Internal
+            consecutiveSilentChunks: 0, consecutiveLoudChunks: 0, hasSpeechStarted: false,
+            startTime: 0, timerInt: null
+        };
+
+        const els = {
+            statusBox: document.getElementById('statusBox'),
+            statusText: document.getElementById('statusText'),
+            statusSub: document.getElementById('statusSub'),
+            visFill: document.getElementById('visFill'),
+            visVal: document.getElementById('visVal'),
+            chunkCount: document.getElementById('chunkCount'),
+            timeVal: document.getElementById('timeVal'),
+            convCount: document.getElementById('convCount'),
+            connectBtn: document.getElementById('connectBtn'),
+            recordBtn: document.getElementById('recordBtn'),
+            chatLog: document.getElementById('chatLog'),
+            scrollArea: document.getElementById('scrollArea'),
+            settingsPanel: document.getElementById('settingsPanel')
+        };
+
+        // --- INITIALIZATION ---
+        function init() {
+            setupSettings();
+            setupBtnLogic();
+        }
+        init();
+
+        function setupSettings() {
+            document.getElementById('silenceSlider').oninput = e => {
+                state.silenceThreshold = e.target.value / 50;
+                document.getElementById('silenceVal').textContent = e.target.value + 'ms';
+            };
+            document.getElementById('minRecordSlider').oninput = e => {
+                state.minChunksBeforeStop = e.target.value / 50;
+                document.getElementById('minRecordVal').textContent = (e.target.value / 1000).toFixed(1) + 's';
+            };
+            document.getElementById('sensitivitySlider').oninput = e => {
+                const v = parseInt(e.target.value);
+                state.volumeThreshold = [0.001, 0.002, 0.005, 0.01, 0.02][v - 1];
+                document.getElementById('sensVal').textContent = ['Very Low', 'Low', 'Med', 'High', 'Max'][v - 1];
+            };
+        }
+
+        function setupBtnLogic() {
+            const btn = els.recordBtn;
+            btn.onmousedown = startRecord;
+            btn.onmouseup = stopRecord;
+            btn.ontouchstart = (e) => { e.preventDefault(); startRecord() };
+            btn.ontouchend = (e) => { e.preventDefault(); stopRecord() };
+            // Also click for toggle in auto mode?
+            btn.onclick = () => { if (state.mode === 'auto') { state.recording ? stopRecord() : startRecord(); } };
+        }
+
+        function toggleSettings() { els.settingsPanel.classList.toggle('open'); }
+        function setMode(m) {
+            state.mode = m;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-mode="${m}"]`).classList.add('active');
+            els.recordBtn.textContent = m === 'auto' ? (state.recording ? '⏹ Stop Recording' : '🎤 Tap to Start') : '🎤 Hold to Record';
+        }
+
+        // --- CORE AUDIO logic ---
+        function getAudioContext() {
+            if (!state.audioContext) state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if (state.audioContext.state === 'suspended') state.audioContext.resume();
+            return state.audioContext;
+        }
+
+        function updateStatus(connected, txt) {
+            els.statusBox.className = 'status-box ' + (connected ? 'connected' : '');
+            els.statusText.textContent = connected ? 'Connected' : 'Disconnected';
+            els.statusSub.textContent = txt;
+            els.connectBtn.textContent = connected ? '🔌 Disconnect' : '🔌 Connect to Server';
+            els.connectBtn.style.background = connected ? '#ef4444' : '#4f46e5';
+            els.recordBtn.disabled = !connected;
+        }
+
+        async function toggleConnection() {
+            if (state.ws && state.ws.readyState === WebSocket.OPEN) {
+                state.ws.close(); return;
+            }
+            try {
+                updateStatus(false, 'Connecting...');
+                state.ws = new WebSocket('ws://localhost:8765');
+                state.ws.onopen = () => updateStatus(true, 'Ready to assist');
+                state.ws.onclose = () => updateStatus(false, 'Not connected');
+                state.ws.onmessage = handleMsg;
+            } catch (e) { updateStatus(false, 'Connection Failed'); }
+        }
+
+        function handleMsg(e) {
+            if (e.data instanceof Blob) {
+                state.audioChunks.push(e.data);
+                clearTimeout(window.playTimer);
+                window.playTimer = setTimeout(playAudio, 100);
+            } else if (typeof e.data === 'string') {
+                const d = JSON.parse(e.data);
+                if (d.type === 'transcription') addMsg('You', d.text, 'user');
+                else if (d.type === 'llm_text') {
+                    addMsg('AI', d.text, 'ai');
+                    state.stats.convs++;
+                    els.convCount.textContent = state.stats.convs;
+                }
+            }
+        }
+
+        function stopCurrentAudio() {
+            if (state.currentAudioSource) {
+                try { state.currentAudioSource.stop(); } catch (e) { }
+                state.currentAudioSource = null;
+            }
+            // FORCE clear buffer to prevent "Twice Advice" / old audio
+            state.audioChunks = [];
+            clearTimeout(window.playTimer);
+        }
+
+        async function startRecord() {
+            if (!state.ws || state.ws.readyState !== WebSocket.OPEN) return;
+            if (state.recording) return;
+
+            // Auto/Manual determines if we kill audio
+            // In Auto, we kill audio if user initiates manually OR if it's a new turn
+            // If it's a "Barge-in" trigger (from playAudio), we might not kill yet? 
+            // No, startRecord ALWAYS implies listening to user, so we should allow echo-cancellation to work.
+            // BUT, if we want to stop the AI talking, we do it here:
+            if (state.mode !== 'auto' || !state.currentAudioSource) {
+                stopCurrentAudio();
+            }
+            // NOTE: If Full Duplex is on (state.currentAudioSource exists), we DO NOT kill it here.
+            // We kill it in process() if speech is loud enough.
+
+            try {
+                const ctx = getAudioContext();
+                state.mediaStream = await navigator.mediaDevices.getUserMedia({
+                    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+                });
+                const src = ctx.createMediaStreamSource(state.mediaStream);
+                state.processor = ctx.createScriptProcessor(4096, 1, 1);
+
+                state.recording = true;
+                state.hasSpeechStarted = false;
+                state.consecutiveLoudChunks = 0;
+                state.consecutiveSilentChunks = 0;
+                state.startTime = Date.now();
+
+                state.processor.onaudioprocess = process;
+                src.connect(state.processor);
+                state.processor.connect(ctx.destination);
+
+                els.recordBtn.classList.add('recording');
+                els.recordBtn.textContent = state.mode === 'auto' ? '⏹ Stop Recording' : '🎤 Recording...';
+
+                state.timerInt = setInterval(() => {
+                    els.timeVal.textContent = ((Date.now() - state.startTime) / 1000).toFixed(1) + 's';
+                }, 100);
+
+            } catch (e) { console.error(e); alert('Mic Error: ' + e.message); }
+        }
+
+        function process(e) {
+            if (!state.recording) return;
+            const input = e.inputBuffer.getChannelData(0);
+
+            let sum = 0; for (let i = 0; i < input.length; i++) sum += input[i] * input[i];
+            const rms = Math.sqrt(sum / input.length);
+
+            // VIS
+            const pct = Math.min(100, Math.floor(rms * 500));
+            els.visFill.style.width = pct + '%';
+            els.visVal.textContent = pct + '%';
+
+            const isSpeaking = rms > state.volumeThreshold;
+
+            // BARGE-IN (FULL DUPLEX)
+            const isGracePeriod = state.audioStartTime && (Date.now() - state.audioStartTime < 1000); // 1s Grace
+            if (state.currentAudioSource && isSpeaking && !isGracePeriod) {
+                // Check sustained loud speech to kill AI
+                if (++state.consecutiveLoudChunks > 5) { // 5 chunks ~ 0.2s of loud speech
+                    stopCurrentAudio();
+                    state.consecutiveLoudChunks = 0;
+                }
+            }
+
+            // AUTO STOP
+            if (state.mode === 'auto') {
+                if (!state.hasSpeechStarted) {
+                    if (isSpeaking && ++state.consecutiveLoudChunks > state.loudChunksToStart) {
+                        state.hasSpeechStarted = true;
+                        if (state.currentAudioSource && !isGracePeriod) stopCurrentAudio();
+                    } else if (!isSpeaking) state.consecutiveLoudChunks = 0;
+                } else {
+                    if (!isSpeaking && ++state.consecutiveSilentChunks > state.silenceThreshold) {
+                        stopRecord(); return;
+                    } else if (isSpeaking) state.consecutiveSilentChunks = 0;
+                }
+            }
+
+            // SEND
+            const ctx = getAudioContext();
+            const ratio = ctx.sampleRate / 16000;
+            const len = Math.floor(input.length / ratio);
+            const pcm = new Int16Array(len);
+            for (let i = 0; i < len; i++) {
+                const s = Math.max(-1, Math.min(1, input[Math.floor(i * ratio)]));
+                pcm[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+            }
+            state.ws.send(pcm.buffer);
+            state.stats.chunks++;
+            els.chunkCount.textContent = state.stats.chunks;
+        }
+
+        function stopRecord() {
+            if (!state.recording) return;
+            state.recording = false;
+            clearInterval(state.timerInt);
+
+            if (state.processor) { state.processor.disconnect(); state.processor = null; }
+            if (state.mediaStream) { state.mediaStream.getTracks().forEach(t => t.stop()); state.mediaStream = null; }
+
+            els.recordBtn.classList.remove('recording');
+            els.recordBtn.textContent = state.mode === 'auto' ? '🎤 Tap to Start' : '🎤 Hold to Record';
+            els.visFill.style.width = '0%';
+        }
+
+        async function playAudio() {
+            if (!state.audioChunks.length) return;
+
+            // 1. CAPTURE & CLEAR (Prevent Missing Audio)
+            const blob = new Blob(state.audioChunks, { type: 'audio/mpeg' });
+            state.audioChunks = [];
+
+            // 2. FULL DUPLEX (Start listening immediately)
+            if (state.mode === 'auto' && !state.recording) {
+                startRecord();
+            }
+
+            const ctx = getAudioContext();
+            const buf = await ctx.decodeAudioData(await blob.arrayBuffer());
+            const src = ctx.createBufferSource();
+            src.buffer = buf;
+            src.connect(ctx.destination);
+
+            // 3. Stop prev (but safely, since we already captured new one)
+            stopCurrentAudio();
+
+            state.currentAudioSource = src;
+            state.audioStartTime = Date.now();
+            src.onended = () => {
+                if (state.currentAudioSource === src) {
+                    state.currentAudioSource = null;
+                    // RELIABILITY FIX: Ensure mic is ON after AI finishes (Fallback for VAD cutoff)
+                    if (state.mode === 'auto' && !state.recording) {
+                        console.log('Restaring mic after playback...');
+                        setTimeout(startRecord, 200);
+                    }
+                }
+            };
+            src.start(0);
+        }
+
+        function addMsg(role, text, type) {
+            const d = document.createElement('div');
+            d.className = `msg ${type}`;
+            d.innerHTML = `<div class="msg-meta">${role} • ${new Date().toLocaleTimeString()}</div>${text}`;
+            els.chatLog.appendChild(d);
+            els.scrollArea.scrollTop = els.scrollArea.scrollHeight;
+        }
+
+    </script>
+</body>
+
+</html>
