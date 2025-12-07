@@ -50,15 +50,21 @@ Amplify is the easiest way to host the static `client/index.html` and assets.
 ### Dockerfile
 We need to add a `Dockerfile` to the root directory to define the backend environment.
 
-### Frontend Config
-We need to update `client/index.html` to not hardcode `localhost`.
-**Proposed Change**:
-```javascript
-// client/index.html
-const WS_URL = window.location.hostname === 'localhost' 
-    ? 'ws://localhost:8765' 
-    : 'wss://<YOUR-APP-RUNNER-URL>'; // You will update this after backend deployment
-```
+### Frontend Configuration (Injecting URL)
+Since `client/index.html` is a static file, we cannot read environment variables at runtime. Instead, we use a placeholder `__WEBSOCKET_URL__` and replace it during the build process.
+
+**In AWS Amplify Console:**
+1.  Go to **Environment variables**.
+2.  Add a variable:
+    -   Key: `WEBSOCKET_URL`
+    -   Value: `wss://<your-app-runner-url>` (e.g., `wss://xyz.awsapprunner.com`)
+
+3.  Go to **Build settings**.
+4.  Add this command to the `preBuild` or `build` phase in `amplify.yml`:
+    ```yaml
+    - sed -i "s|__WEBSOCKET_URL__|$WEBSOCKET_URL|g" client/index.html
+    ```
+    *(This command finds the placeholder string and replaces it with your actual environment variable value).*
 
 ## Cost Estimates (Rough)
 -   **App Runner**: ~$5/month (requests) + provisioned instances (pauses when idle in some configs, but persistent connection needs active instance). ~$25/month for 1 active instance 24/7.
