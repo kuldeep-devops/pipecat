@@ -47,6 +47,8 @@ You may help with:
 Since this is a voice conversation, keep responses brief and conversational - 1-2 sentences maximum unless the user asks for detailed information."""
 
 
-def get_system_prompt():
-    """Get the healthcare system prompt"""
+def get_system_prompt(kb_context=""):
+    """Get the healthcare system prompt with injected knowledge base"""
+    if kb_context:
+        return f"{HEALTHCARE_SYSTEM_PROMPT}\n\n{kb_context}"
     return HEALTHCARE_SYSTEM_PROMPT

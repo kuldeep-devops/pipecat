@@ -12,6 +12,8 @@ from config.settings import config
 from config.prompts import get_system_prompt
 
 
+from server.knowledge_base import HealthcareKnowledgeBase
+
 class VoiceAssistant:
     """Complete voice assistant with direct Deepgram integration"""
     
@@ -22,11 +24,15 @@ class VoiceAssistant:
         
         self.openai_client = OpenAI(api_key=self.openai_config.api_key)
         
-        # Initialize conversation with healthcare persona
+        # Load Knowledge Base
+        self.kb = HealthcareKnowledgeBase()
+        kb_context = self.kb.get_context_string()
+
+        # Initialize conversation with healthcare persona + KB
         self.conversation_history = [
             {
                 "role": "system",
-                "content": get_system_prompt()
+                "content": get_system_prompt(kb_context)
             }
         ]
     
@@ -44,7 +50,7 @@ class VoiceAssistant:
             f"&language=en-US"
             f"&punctuate=true"
             f"&interim_results=false"
-            f"&endpointing=500"
+            f"&endpointing=1000"
         )
         
         logger.info("🔌 Connecting to Deepgram...")

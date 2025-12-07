@@ -410,10 +410,10 @@
 
             <!-- Mode -->
             <div class="mode-group">
-                <button class="mode-btn active" data-mode="auto" onclick="setMode('auto')">🎯 Auto-Stop (Hands
-                    Free)</button>
-                <button class="mode-btn" data-mode="manual" onclick="setMode('manual')">👆 Manual
-                    (Push-to-Talk)</button>
+                <button class="mode-btn" data-mode="auto" onclick="setMode('auto')" style="display:none">🎯 Auto-Stop
+                    (Hands Free)</button>
+                <button class="mode-btn active" data-mode="manual" onclick="setMode('manual')" style="width:100%">👆
+                    Manual (Push-to-Talk)</button>
             </div>
 
             <!-- Audio Level -->
@@ -481,7 +481,7 @@
         // --- APP STATE ---
         const state = {
             ws: null, audioContext: null, mediaStream: null, processor: null,
-            recording: false, mode: 'auto',
+            recording: false, mode: 'manual',
             audioChunks: [], currentAudioSource: null, audioStartTime: 0,
             // Settings
             silenceThreshold: 10, minChunksBeforeStop: 40, loudChunksToStart: 3, volumeThreshold: 0.005,
