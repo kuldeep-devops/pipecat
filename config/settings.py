@@ -71,7 +71,7 @@ class ServerConfig:
         
         # Always allow localhost/127.0.0.1 for dev
         if not self.allowed_origins:
-            self.allowed_origins = ["http://localhost", "http://127.0.0.1", "null", "file://"] # null/file for local files
+            self.allowed_origins = ["*","http://localhost", "http://127.0.0.1", "null", "file://"] # null/file for local files
         else:
             # Ensure localhost is always allowed for testing unless strictly disabled (not doing that here for simplicity)
             server_origins = [

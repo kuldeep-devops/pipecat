@@ -25,7 +25,13 @@ async def start_server():
         # Check if origin is allowed
         # Note: None/null origin is common for local scripts or some tools, 
         # but in production browsers it will be set.
-        if origin and origin not in config.server.allowed_origins:
+        
+        # FIX: Allow wildcard '*'
+        is_allowed = origin in config.server.allowed_origins
+        if "*" in config.server.allowed_origins:
+            is_allowed = True
+            
+        if origin and not is_allowed:
             logger.warning(f"⛔ Rejected connection from unauthorized origin: {origin}")
             return (403, [], b"Forbidden: Invalid Origin")
             
