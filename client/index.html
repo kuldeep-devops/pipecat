@@ -717,7 +717,7 @@
 
                 // If the placeholder wasn't replaced (running locally), default to localhost
                 if (wsUrl === '__WEBSOCKET_URL__' || wsUrl.includes('WEBSOCKET_URL')) {
-                    wsUrl = 'ws://localhost:8765';
+                    wsUrl = 'ws://ec2-54-189-57-247.us-west-2.compute.amazonaws.com:8765';
                     console.log('Using Localhost (Placeholder active)');
                 } else {
                     console.log('Using Production URL (Injected)');
