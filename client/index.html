@@ -713,11 +713,11 @@
                 // 1. Localhost: Defaults to ws://localhost:8765
                 // 2. Production: AWS Amplify will replace '__WEBSOCKET_URL__' with the real URL via 'sed'
 
-                let wsUrl = 'ws://ec2-54-189-57-247.us-west-2.compute.amazonaws.com:8765';
+                let wsUrl = 'wss://https://previews-memorial-lit-obtained.trycloudflare.com';
 
                 // If the placeholder wasn't replaced (running locally), default to localhost
                 if (wsUrl === '__WEBSOCKET_URL__' || wsUrl.includes('WEBSOCKET_URL')) {
-                    wsUrl = 'ws://ec2-54-189-57-247.us-west-2.compute.amazonaws.com:8765';
+                    wsUrl = 'ws://localhost:8765';
                     console.log('Using Localhost (Placeholder active)');
                 } else {
                     console.log('Using Production URL (Injected)');
