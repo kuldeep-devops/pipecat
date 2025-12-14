@@ -740,10 +740,27 @@
             } else if (typeof e.data === 'string') {
                 const d = JSON.parse(e.data);
                 if (d.type === 'transcription') addMsg('You', d.text, 'user');
-                else if (d.type === 'llm_text') {
+                else if (d.type === 'greeting') {
+                    // Greeting is sent after first user message, display it in UI
+                    addMsg('AI', d.text, 'ai');
+                    // For long texts, wait a bit longer for audio chunks to arrive
+                    if (d.text && d.text.length > 500) {
+                        clearTimeout(window.playTimer);
+                        window.playTimer = setTimeout(playAudio, 500);
+                    }
+                } else if (d.type === 'llm_text') {
                     addMsg('AI', d.text, 'ai');
                     state.stats.convs++;
                     els.convCount.textContent = state.stats.convs;
+                    // For long texts, wait a bit longer for audio chunks to arrive
+                    if (d.text && d.text.length > 500) {
+                        clearTimeout(window.playTimer);
+                        window.playTimer = setTimeout(playAudio, 500);
+                    }
+                } else if (d.type === 'tts_complete') {
+                    // Signal that all TTS chunks have been sent
+                    clearTimeout(window.playTimer);
+                    window.playTimer = setTimeout(playAudio, 200);
                 }
             }
         }

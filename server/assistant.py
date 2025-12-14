@@ -132,7 +132,7 @@ class VoiceAssistant:
                                     })
                                     greeting_sent = True
                                 
-                                # Get LLM response
+                                # Get LLM response (user message will be added inside this function)
                                 await self.get_llm_response(transcript, websocket)
             
             # Run both tasks
