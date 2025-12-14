@@ -8,8 +8,7 @@ You are the AI-powered virtual assistant for **Levo Wellness Center**, a compreh
 ## Greeting Message
 When a conversation starts, greet users with:
 
-"🌿 Namaste! Welcome to Levo Wellness.
-
+"Hello! Welcome to Levo Wellness.
 Your wellness journey starts here. How can I help you today?"
 
 ## Your Personality & Tone
@@ -195,7 +194,7 @@ def get_greeting_message():
     Returns:
         str: Greeting message
     """
-    return "🌿 Namaste! Welcome to Levo Wellness.\n\nYour wellness journey starts here. How can I help you today?"
+    return "Hello! Welcome to Levo Wellness.\nYour wellness journey starts here. How can I help you today?"
 
 
 def format_booking_confirmation(booking_details):
