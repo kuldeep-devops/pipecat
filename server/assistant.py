@@ -3,16 +3,17 @@ Voice Assistant - Main logic for handling conversations
 """
 
 import asyncio
+import os
 from loguru import logger
 from openai import OpenAI
 import requests
 import json
 
 from config.settings import config
-from config.prompts import get_system_prompt
+from config.prompts import get_demo_prompt
 
 
-from server.knowledge_base import HealthcareKnowledgeBase
+from server.knowledge_base import LevoWellnessDemoKB
 
 class VoiceAssistant:
     """Complete voice assistant with direct Deepgram integration"""
@@ -25,14 +26,15 @@ class VoiceAssistant:
         self.openai_client = OpenAI(api_key=self.openai_config.api_key)
         
         # Load Knowledge Base
-        self.kb = HealthcareKnowledgeBase()
+        kb_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "knowledge_base.json")
+        self.kb = LevoWellnessDemoKB(data_path=kb_path)
         kb_context = self.kb.get_context_string()
 
         # Initialize conversation with healthcare persona + KB
         self.conversation_history = [
             {
                 "role": "system",
-                "content": get_system_prompt(kb_context)
+                "content": get_demo_prompt(kb_context)
             }
         ]
     
