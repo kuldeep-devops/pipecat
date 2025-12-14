@@ -19,54 +19,182 @@
     "voice": "Welcome to Levo Wellness. Your wellness journey starts here.",
     "text": "Welcome to Levo Wellness.\n\nYour wellness journey starts here."
   },
-  "services": {
+  "departments": {
     "salon": {
-      "hair": {
-        "name": "Hair Services",
-        "short_name": "haircut",
-        "staff": "Radhika Mehta",
-        "types": ["Haircuts", "Coloring", "Treatments"],
-        "price_range": {"min": 500, "max": 8000},
-        "duration": "30 mins - 3 hours",
-        "availability": "Mon-Sat: 10 AM - 8 PM, Sun: 11 AM - 6 PM"
-      },
-      "spa": {
-        "name": "SPA Services",
-        "short_name": "massage",
-        "staff": "Neha Verma",
-        "types": ["Swedish Massage", "Deep Tissue", "Aromatherapy"],
-        "price_range": {"min": 1500, "max": 12000},
-        "duration": "60 mins - 3 hours",
-        "availability": "Mon-Sat: 10 AM - 8 PM, Sun: 11 AM - 6 PM"
+      "name": "Salon",
+      "services": {
+        "hair": {
+          "name": "Hair Services",
+          "short_name": "hair",
+          "staff": "Radhika Mehta",
+          "types": ["Haircuts", "Hair Coloring", "Hair Treatments", "Hair Styling"],
+          "price_range": {"min": 500, "max": 8000},
+          "duration": "30 mins - 3 hours",
+          "available_days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+          "slots": {
+            "monday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "tuesday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "wednesday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "thursday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "friday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "saturday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"]
+          }
+        },
+        "nail": {
+          "name": "Nail Services",
+          "short_name": "nail",
+          "staff": "Priya Sharma",
+          "types": ["Manicure", "Pedicure", "Nail Art", "Nail Extensions"],
+          "price_range": {"min": 300, "max": 5000},
+          "duration": "30 mins - 2 hours",
+          "available_days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+          "slots": {
+            "monday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "tuesday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "wednesday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "thursday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "friday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "saturday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"]
+          }
+        },
+        "spa": {
+          "name": "SPA Services",
+          "short_name": "spa",
+          "staff": "Neha Verma",
+          "types": ["Swedish Massage", "Deep Tissue Massage", "Aromatherapy", "Hot Stone Massage"],
+          "price_range": {"min": 1500, "max": 12000},
+          "duration": "60 mins - 3 hours",
+          "available_days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+          "slots": {
+            "monday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "tuesday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "wednesday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "thursday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "friday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "saturday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"]
+          }
+        }
+      }
+    },
+    "aesthetics": {
+      "name": "Aesthetics",
+      "services": {
+        "skin_health": {
+          "name": "Skin Health",
+          "short_name": "skin",
+          "staff": "Dr. Anjali Khanna",
+          "types": ["Facial Treatments", "Chemical Peels", "HydraFacial", "Acne Treatment", "Anti-aging"],
+          "price_range": {"min": 2000, "max": 15000},
+          "duration": "60 mins - 2 hours",
+          "available_days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+          "slots": {
+            "monday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"],
+            "tuesday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"],
+            "wednesday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"],
+            "thursday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"],
+            "friday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"],
+            "saturday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"]
+          }
+        },
+        "hair_body": {
+          "name": "Hair & Body",
+          "short_name": "hair body",
+          "staff": "Dr. Rohan Kapoor",
+          "types": ["Laser Hair Removal", "Body Contouring", "Hair Loss Treatment", "Body Treatments"],
+          "price_range": {"min": 3000, "max": 20000},
+          "duration": "30 mins - 2 hours",
+          "available_days": ["monday", "wednesday", "friday", "saturday"],
+          "slots": {
+            "monday": ["10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"],
+            "wednesday": ["10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"],
+            "friday": ["10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"],
+            "saturday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"]
+          }
+        },
+        "holistic_wellness": {
+          "name": "Holistic Wellness",
+          "short_name": "holistic",
+          "staff": "Dr. Meera Patel",
+          "types": ["Ayurvedic Treatments", "Detox Programs", "Wellness Consultations", "Therapeutic Massages"],
+          "price_range": {"min": 2000, "max": 18000},
+          "duration": "60 mins - 3 hours",
+          "available_days": ["monday", "tuesday", "thursday", "friday", "saturday"],
+          "slots": {
+            "monday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"],
+            "tuesday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"],
+            "thursday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"],
+            "friday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"],
+            "saturday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"]
+          }
+        }
       }
     },
     "wellness": {
-      "yoga": {
-        "name": "Yoga Classes",
-        "short_name": "yoga",
-        "instructor": "Vikram Nair",
-        "types": ["Hatha", "Vinyasa", "Prenatal"],
-        "price": 600,
-        "duration": "60 minutes",
-        "availability": "Daily: 6 AM, 7:30 AM, 5:30 PM, 7 PM"
-      },
-      "meditation": {
-        "name": "Meditation",
-        "short_name": "meditation",
-        "instructor": "Ananya Desai",
-        "types": ["Guided", "Mindfulness", "Breathwork"],
-        "price": 500,
-        "duration": "30 minutes",
-        "availability": "Daily: 7 AM, 6 PM, 7:30 PM"
+      "name": "Wellness",
+      "services": {
+        "pilates": {
+          "name": "Pilates",
+          "short_name": "pilates",
+          "instructor": "Sneha Reddy",
+          "types": ["Mat Pilates", "Reformer Pilates", "Group Classes", "Private Sessions"],
+          "price": 800,
+          "duration": "60 minutes",
+          "available_days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+          "slots": {
+            "monday": ["7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "tuesday": ["7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "wednesday": ["7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "thursday": ["7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "friday": ["7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "5:00 PM", "6:00 PM", "7:00 PM"],
+            "saturday": ["7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "5:00 PM", "6:00 PM"]
+          }
+        },
+        "yoga": {
+          "name": "Yoga Classes",
+          "short_name": "yoga",
+          "instructor": "Vikram Nair",
+          "types": ["Hatha Yoga", "Vinyasa Yoga", "Prenatal Yoga", "Yin Yoga"],
+          "price": 600,
+          "duration": "60 minutes",
+          "available_days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+          "slots": {
+            "monday": ["6:00 AM", "7:30 AM", "9:00 AM", "5:30 PM", "7:00 PM"],
+            "tuesday": ["6:00 AM", "7:30 AM", "9:00 AM", "5:30 PM", "7:00 PM"],
+            "wednesday": ["6:00 AM", "7:30 AM", "9:00 AM", "5:30 PM", "7:00 PM"],
+            "thursday": ["6:00 AM", "7:30 AM", "9:00 AM", "5:30 PM", "7:00 PM"],
+            "friday": ["6:00 AM", "7:30 AM", "9:00 AM", "5:30 PM", "7:00 PM"],
+            "saturday": ["6:00 AM", "7:30 AM", "9:00 AM", "11:00 AM", "5:30 PM", "7:00 PM"],
+            "sunday": ["7:00 AM", "8:30 AM", "11:00 AM", "5:00 PM"]
+          }
+        },
+        "meditation": {
+          "name": "Meditation",
+          "short_name": "meditation",
+          "instructor": "Ananya Desai",
+          "types": ["Guided Meditation", "Mindfulness", "Breathwork", "Group Sessions"],
+          "price": 500,
+          "duration": "30 minutes",
+          "available_days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+          "slots": {
+            "monday": ["7:00 AM", "8:00 AM", "6:00 PM", "7:30 PM"],
+            "tuesday": ["7:00 AM", "8:00 AM", "6:00 PM", "7:30 PM"],
+            "wednesday": ["7:00 AM", "8:00 AM", "6:00 PM", "7:30 PM"],
+            "thursday": ["7:00 AM", "8:00 AM", "6:00 PM", "7:30 PM"],
+            "friday": ["7:00 AM", "8:00 AM", "6:00 PM", "7:30 PM"],
+            "saturday": ["7:00 AM", "8:00 AM", "9:00 AM", "6:00 PM", "7:30 PM"],
+            "sunday": ["8:00 AM", "9:00 AM", "6:00 PM"]
+          }
+        }
       }
     }
   },
   "doctors": {
     "dermatologist": {
       "name": "Dr. Anjali Khanna",
-      "short_name": "skin doctor",
+      "short_name": "dermatologist",
       "qualification": "MD Dermatology",
-      "specialization": ["Acne", "Anti-aging", "Laser Treatments"],
+      "department": "Aesthetics - Skin Health",
+      "specialization": ["Acne Treatment", "Anti-aging", "Laser Treatments", "Skin Disorders"],
       "consultation_fee": 1200,
       "available_days": ["monday", "wednesday", "friday"],
       "slots": {
@@ -75,17 +203,47 @@
         "friday": ["2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"]
       }
     },
+    "ayurveda": {
+      "name": "Dr. Rajesh Kumar",
+      "short_name": "ayurveda doctor",
+      "qualification": "BAMS, MD Ayurveda",
+      "department": "Wellness - Holistic",
+      "specialization": ["Panchakarma", "Ayurvedic Consultations", "Herbal Treatments", "Detoxification"],
+      "consultation_fee": 1000,
+      "available_days": ["tuesday", "thursday", "saturday"],
+      "slots": {
+        "tuesday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM"],
+        "thursday": ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"],
+        "saturday": ["10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM"]
+      }
+    },
     "nutritionist": {
       "name": "Ms. Priya Sengupta",
-      "short_name": "diet expert",
+      "short_name": "nutritionist",
       "qualification": "MSc Clinical Nutrition",
-      "specialization": ["Weight Management", "Diabetes", "PCOD"],
+      "department": "Wellness",
+      "specialization": ["Weight Management", "Diabetes Management", "PCOD", "Nutritional Counseling"],
       "consultation_fee": 1500,
       "available_days": ["monday", "wednesday", "saturday"],
       "slots": {
         "monday": ["11:00 AM", "2:00 PM", "4:00 PM"],
         "wednesday": ["11:00 AM", "2:00 PM", "4:00 PM", "5:00 PM"],
-        "saturday": ["11:00 AM", "12:00 PM", "1:00 PM"]
+        "saturday": ["11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM"]
+      }
+    },
+    "pain_relief": {
+      "name": "Dr. Arvind Singh",
+      "short_name": "pain relief doctor",
+      "qualification": "MD Physical Medicine",
+      "department": "Wellness",
+      "specialization": ["Chronic Pain Management", "Physiotherapy", "Musculoskeletal Disorders", "Rehabilitation"],
+      "consultation_fee": 1300,
+      "available_days": ["monday", "tuesday", "thursday", "friday"],
+      "slots": {
+        "monday": ["10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
+        "tuesday": ["10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
+        "thursday": ["10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"],
+        "friday": ["10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
       }
     }
   },
@@ -94,13 +252,19 @@
       "name": "Complete Wellness Package",
       "price": 12000,
       "validity": "3 months",
-      "summary": "12 Yoga sessions, Nutrition consultation, 2 Meditation sessions"
+      "summary": "12 Yoga sessions, 8 Pilates sessions, Nutrition consultation, 4 Meditation sessions"
     },
     "skincare": {
       "name": "Skin Care Package",
       "price": 18000,
       "validity": "2 months",
-      "summary": "6 Chemical Peels, 2 HydraFacials, Skincare kit"
+      "summary": "6 Chemical Peels, 2 HydraFacials, Skincare kit, Dermatologist consultation"
+    },
+    "aesthetics": {
+      "name": "Aesthetics Package",
+      "price": 25000,
+      "validity": "3 months",
+      "summary": "Skin Health treatments, Hair & Body services, Holistic Wellness consultations"
     }
   },
   "booking_rules": {
@@ -114,11 +278,20 @@
       "massage": "spa",
       "haircut": "hair",
       "hair color": "hair",
-      "skin": "dermatologist",
+      "nail": "nail",
+      "manicure": "nail",
+      "pedicure": "nail",
+      "skin": "skin health",
+      "facial": "skin health",
+      "pilates": "pilates",
+      "yoga": "yoga",
+      "meditation": "meditation",
+      "dermatologist": "dermatologist",
+      "ayurveda": "ayurveda",
       "diet": "nutritionist",
       "weight": "nutritionist",
-      "yoga": "yoga",
-      "meditation": "meditation"
+      "pain": "pain relief",
+      "physiotherapy": "pain relief"
     },
     "time_keywords": {
       "morning": ["7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM"],

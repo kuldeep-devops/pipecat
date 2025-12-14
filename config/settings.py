@@ -10,12 +10,14 @@ from dataclasses import dataclass, field
 class DeepgramConfig:
     """Deepgram STT configuration"""
     api_key: str = ""
-    model: str = "nova-2-general"
-    language: str = "en-US"
+    model: str = "nova-3"
+    language: str = "multi"
     sample_rate: int = 16000
     encoding: str = "linear16"
     channels: int = 1
     punctuate: bool = True
+    smart_format: bool = True
+    numerals: bool = True
     interim_results: bool = False
     endpointing: int = 500  # Changed back to 500 to match working version
     

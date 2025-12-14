@@ -42,18 +42,18 @@ class VoiceAssistant:
         """Handle a browser client connection"""
         logger.info(f"🎙️  Client connected: {websocket.remote_address}")
         
-        # Build Deepgram URL - exact copy from working version
+        # Build Deepgram URL using config values
         deepgram_url = (
             f"wss://api.deepgram.com/v1/listen"
-            f"?encoding=linear16"
-            f"&sample_rate=16000"
-            f"&channels=1"
-            f"&model=nova-3"
-            f"&language=multi"
-            f"&interim_results=false"
-            f"&endpointing=1000"
-            f"&smart_format=true"
-            f"&numerals=true"
+            f"?encoding={self.deepgram_config.encoding}"
+            f"&sample_rate={self.deepgram_config.sample_rate}"
+            f"&channels={self.deepgram_config.channels}"
+            f"&model={self.deepgram_config.model}"
+            f"&language={self.deepgram_config.language}"
+            f"&interim_results={str(self.deepgram_config.interim_results).lower()}"
+            f"&endpointing={self.deepgram_config.endpointing}"
+            f"&smart_format={str(self.deepgram_config.smart_format).lower()}"
+            f"&numerals={str(self.deepgram_config.numerals).lower()}"
         )
         
         logger.info("🔌 Connecting to Deepgram...")
@@ -238,6 +238,55 @@ class VoiceAssistant:
             elif "i can help" in response_lower or "i can assist" in response_lower:
                 assistant_text = "I'm here to help."
                 logger.warning("⚠️ Detected redundant help statement, replacing with simple acknowledgment")
+        
+        # Check if service listing includes too much detail (prices, availability when not asked)
+        # If user asked "What services are available?" and response includes prices/details, simplify it
+        if "what services" in self.conversation_history[-1].get("content", "").lower() or "services available" in self.conversation_history[-1].get("content", "").lower():
+            # Check if response includes prices (₹ or rupees) or detailed availability
+            if ("₹" in assistant_text or "rupees" in response_lower or "price" in response_lower) and "available" not in self.conversation_history[-1].get("content", "").lower():
+                # Simplify to just departments (matching new structure)
+                departments = []
+                if "salon" in response_lower:
+                    departments.append("Salon")
+                if "aesthetics" in response_lower:
+                    departments.append("Aesthetics")
+                if "wellness" in response_lower:
+                    departments.append("Wellness")
+                if "doctor" in response_lower or "dermatologist" in response_lower or "nutritionist" in response_lower or "ayurveda" in response_lower or "pain" in response_lower:
+                    departments.append("Doctors")
+                if "package" in response_lower:
+                    departments.append("Packages")
+                
+                if departments:
+                    assistant_text = "We offer " + ", ".join(departments) + "."
+                    logger.warning("⚠️ Detected detailed service listing, simplified to departments only")
+        
+        # Response length filter - enforce 1-2 sentences maximum
+        sentences = assistant_text.split('. ')
+        # Count sentences (account for final period)
+        sentence_count = len([s for s in sentences if s.strip()])
+        if sentence_count > 2:
+            # Take only first 2 sentences
+            first_two = '. '.join(sentences[:2])
+            # Ensure it ends with proper punctuation
+            if not first_two.rstrip().endswith(('.', '!', '?')):
+                first_two += '.'
+            assistant_text = first_two
+            logger.warning(f"⚠️ Response too long ({sentence_count} sentences), truncated to 2 sentences")
+        
+        # Word count check - if response is too wordy (>50 words), try to shorten
+        word_count = len(assistant_text.split())
+        if word_count > 50:
+            # If it's a list, try to convert to bullet points
+            if ':' in assistant_text or ',' in assistant_text:
+                # Try to extract key points
+                parts = assistant_text.split(':')
+                if len(parts) > 1:
+                    # Keep the intro and first key point
+                    intro = parts[0].strip()
+                    first_point = parts[1].split(',')[0].strip() if ',' in parts[1] else parts[1].split('.')[0].strip()
+                    assistant_text = f"{intro}: {first_point}."
+                    logger.warning(f"⚠️ Response too wordy ({word_count} words), shortened")
         
         # Add to history
         self.conversation_history.append({

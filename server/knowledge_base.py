@@ -62,15 +62,20 @@ class LevoWellnessSmartKB:
 
     def get_service_by_type(self, service_type):
         """Get service details by type (spa, hair, yoga, etc.)"""
-        services = self.data.get('services', {})
+        departments = self.data.get('departments', {})
         
-        # Search in salon
-        salon = services.get('salon', {})
+        # Search in Salon department
+        salon = departments.get('salon', {}).get('services', {})
         if service_type in salon:
             return salon[service_type]
         
-        # Search in wellness
-        wellness = services.get('wellness', {})
+        # Search in Aesthetics department
+        aesthetics = departments.get('aesthetics', {}).get('services', {})
+        if service_type in aesthetics:
+            return aesthetics[service_type]
+        
+        # Search in Wellness department
+        wellness = departments.get('wellness', {}).get('services', {})
         if service_type in wellness:
             return wellness[service_type]
         
@@ -148,10 +153,11 @@ class LevoWellnessSmartKB:
             context_parts.append("## Pricing Information Available")
             context_parts.append("(Look up specific price when user asks about a service)")
         
-        if any(word in query_lower for word in ['doctor', 'dermatologist', 'nutritionist']):
+        if any(word in query_lower for word in ['doctor', 'dermatologist', 'nutritionist', 'ayurveda', 'pain']):
             context_parts.append("## Doctors")
-            context_parts.append("- Dermatologist: Dr. Anjali Khanna")
-            context_parts.append("- Nutritionist: Ms. Priya Sengupta")
+            doctors = self.data.get('doctors', {})
+            for specialty, doctor_info in doctors.items():
+                context_parts.append(f"- {doctor_info.get('name', specialty)}: {doctor_info.get('qualification', '')}")
         
         return '\n'.join(context_parts) if context_parts else ""
 
