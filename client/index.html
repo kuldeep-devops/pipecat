@@ -736,7 +736,10 @@
             if (e.data instanceof Blob) {
                 state.audioChunks.push(e.data);
                 clearTimeout(window.playTimer);
-                window.playTimer = setTimeout(playAudio, 100);
+                // Increased timeout to ensure all chunks arrive, especially for long texts
+                // Longer texts will be chunked server-side, so we wait longer
+                const timeout = state.audioChunks.length > 10 ? 300 : 150;
+                window.playTimer = setTimeout(playAudio, timeout);
             } else if (typeof e.data === 'string') {
                 const d = JSON.parse(e.data);
                 if (d.type === 'transcription') addMsg('You', d.text, 'user');
@@ -744,6 +747,16 @@
                     addMsg('AI', d.text, 'ai');
                     state.stats.convs++;
                     els.convCount.textContent = state.stats.convs;
+                    // For long texts, wait a bit longer for audio chunks to arrive
+                    if (d.text && d.text.length > 500) {
+                        clearTimeout(window.playTimer);
+                        // Reset timer with longer delay for long texts
+                        window.playTimer = setTimeout(playAudio, 500);
+                    }
+                } else if (d.type === 'tts_complete') {
+                    // Signal that all TTS chunks have been sent
+                    clearTimeout(window.playTimer);
+                    window.playTimer = setTimeout(playAudio, 200);
                 }
             }
         }
