@@ -743,7 +743,16 @@
             } else if (typeof e.data === 'string') {
                 const d = JSON.parse(e.data);
                 if (d.type === 'transcription') addMsg('You', d.text, 'user');
-                else if (d.type === 'llm_text') {
+                else if (d.type === 'greeting') {
+                    // Greeting is sent once on connection, don't count as conversation
+                    addMsg('AI', d.text, 'ai');
+                    // For long texts, wait a bit longer for audio chunks to arrive
+                    if (d.text && d.text.length > 500) {
+                        clearTimeout(window.playTimer);
+                        // Reset timer with longer delay for long texts
+                        window.playTimer = setTimeout(playAudio, 500);
+                    }
+                } else if (d.type === 'llm_text') {
                     addMsg('AI', d.text, 'ai');
                     state.stats.convs++;
                     els.convCount.textContent = state.stats.convs;

@@ -75,14 +75,20 @@ class VoiceAssistant:
         # Send ready to browser
         await websocket.send(json.dumps({'type': 'ready'}))
         
-        # Send greeting message
+        # Send greeting message (only once on connection, not during conversations)
         greeting = get_demo_greeting()
         logger.info(f"👋 Sending greeting: {greeting}")
         await websocket.send(json.dumps({
-            'type': 'llm_text',
+            'type': 'greeting',
             'text': greeting
         }))
         await self.text_to_speech(greeting, websocket)
+        
+        # Mark that greeting has been sent (add to conversation history so LLM knows)
+        self.conversation_history.append({
+            "role": "assistant",
+            "content": greeting
+        })
         
         try:
             async def forward_audio():
