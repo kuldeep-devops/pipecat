@@ -1,118 +1,138 @@
-# 🚀 AWS Deployment Guide (Step-by-Step)
+# 🚀 AWS EC2 Deployment Guide
 
-This guide is designed for anyone to deploy the **HealthCare Voice Assistant** to the cloud. You do not need to be a developer to follow these steps.
+Complete guide for deploying the **Healthcare Voice Assistant** to AWS EC2 with free SSL support.
 
 ---
 
 ## ✅ Prerequisites
-1.  **AWS Account**: Login to [aws.amazon.com](https://aws.amazon.com).
-2.  **GitHub Account**: Ensure this code is pushed to your GitHub repository.
-3.  **API Keys**: Have your `DEEPGRAM_API_KEY`, `OPENAI_API_KEY`, and `ELEVENLABS_API_KEY` ready.
+1. **AWS Account**: Login to aws.amazon.com
+2. **API Keys**: Have your DEEPGRAM_API_KEY, OPENAI_API_KEY, and ELEVENLABS_API_KEY ready
+3. **Domain (Optional)**: Can use Cloudflare Tunnel for free SSL without domain
 
 ---
 
-## Part 1: Deploy Backend (AWS App Runner)
-*This runs the "Brain" of the AI (Python Server).*
+## Quick Demo with Cloudflare Tunnel (10 minutes)
 
-1.  **Go to AWS App Runner**: Search for "App Runner" in the AWS search bar.
-2.  **Click "Create service"**.
-3.  **Source & Repository**:
-    *   **Repository type**: Select "Source code repository".
-    *   **Provider**: Select "GitHub" (Connect your account if needed).
-    *   **Repository**: Select your `healthcare-voice-assistant` repo.
-    *   **Branch**: Select `main`.
-    *   **Deployment settings**: Select "Automatic" (so it updates when you push code).
-    *   Click **Next**.
-4.  **Configure Build**:
-    *   **Configuration file**: Select "Configure all settings here".
-    *   **Runtime**: Select `Python 3.10`.
-    *   **Build command**: `pip install -r requirements.txt`
-    *   **Start command**: `python main.py`
-    *   **Port**: `8765` (Important! Change default 8080 to 8765).
-    *   Click **Next**.
-5.  **Configure Service**:
-    *   **Service name**: Enter `healthcare-backend`.
-    *   **Environment variables** (Click "Add environment variable"):
-        *   Key: `DEEPGRAM_API_KEY` | Value: `your_key_here`
-        *   Key: `OPENAI_API_KEY`   | Value: `your_key_here`
-        *   Key: `ELEVENLABS_API_KEY`| Value: `your_key_here`
-    *   *(Optional)* **Auto scaling**: Leave defaults.
-    *   *(Optional)* **Health check**: Leave defaults.
-    *   Click **Next**, then **Create & Deploy**.
-6.  **Wait**: It will take 5-10 minutes.
-7.  **Copy URL**: Once active, copy the "Default domain" (e.g., `https://xyz.awsapprunner.com`). 
-    *   **Note**: We need the **WSS** version. Just replace `https://` with `wss://`.
-    *   Example: `wss://xyz.awsapprunner.com` -> **SAVE THIS URL!**
+### Step 1: Launch EC2 Instance
 
-### (Alternative) Part 1: Deploy from ECR Image
-*If you already have a Docker image in Amazon ECR:*
+1. Go to EC2 Console in AWS
+2. Click "Launch Instance"
+3. Configure:
+   - Name: voice-assistant-server
+   - AMI: Ubuntu Server 22.04 LTS
+   - Instance type: t3.small
+   - Security Group: Allow ports 22, 80, 443, 8765
+4. Launch and note the Public IP
 
-1.  **Source**: Select "Container registry".
-2.  **Provider**: Select "Amazon ECR".
-3.  **Image URI**: Browse and select your image tag (e.g., `latest`).
-    > [!WARNING]
-    > **Mac Users (M1/M2/M3)**: You **MUST** build your image for the cloud architecture (Intel/AMD), or it will fail silently.
-    >
-    > Run this command to build correctly:
-    > ```bash
-    > docker build --platform linux/amd64 -t healthcare-assistant-backend .
-    > ```
-    > Then push this new image to ECR.
+### Step 2: Setup Docker
 
-4.  **Deployment settings**: "Automatic" (if you want auto-deploy on new images) or "Manual".
-5.  **Configuration**:
-    *   **Port**: `8765`
-    *   **Start command**: Leave empty (it uses the Dockerfile's CMD).
-    *   **Environment variables**: Same as above (Add your 3 API keys).
-    *   Proceed to deploy.
+```bash
+ssh -i your-key.pem ubuntu@<EC2-IP>
+sudo apt update && sudo apt upgrade -y
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker ubuntu
+exit
+```
 
----
+### Step 3: Run Container
 
-## Part 2: Deploy Frontend (AWS Amplify)
-*This hosts the "Website" (UI) that you see in the browser.*
+```bash
+git clone https://github.com/your-repo/healthcare-voice-assistant.git
+cd healthcare-voice-assistant
 
-1.  **Go to AWS Amplify**: Search for "Amplify" in AWS.
-2.  **Click "Create new app"** -> "GitHub".
-3.  **Connect Repo**:
-    *   Select your `healthcare-voice-assistant` repo and `main` branch.
-    *   Click **Next**.
-4.  **Build Settings** (The detailed part):
-    *   **App name**: `healthcare-frontend`.
-    *   **Frontend build command**: Leave blank (or type `echo "Skip"`).
-    *   **Build output directory**: Type `client`.
-    *   **IMPORTANT**: Click the **"Edit YML file"** button.
-    *   **Replace everything** with this code:
-        ```yaml
-        version: 1
-        frontend:
-          phases:
-            build:
-              commands:
-                - sed -i "s|__WEBSOCKET_URL__|$WEBSOCKET_URL|g" client/index.html
-          artifacts:
-            baseDirectory: client
-            files:
-              - '**/*'
-        ```
-    *   Click **Save** inside the editor.
-    *   Click **Next**.
-5.  **Review & Create**:
-    *   Click **Save and deploy**.
-6.  **Configure Environment Variable** (Connect the Frontend to Backend):
-    *   **WAIT** for the first deployment (it might fail or simple work but point to localhost).
-    *   Go to **App settings** (left menu) -> **Environment variables**.
-    *   Click **Manage variables**.
-    *   Add a variable:
-        *   **Key**: `WEBSOCKET_URL`
-        *   **Value**: Paste the **WSS URL** from Part 1 (e.g., `wss://xyz.awsapprunner.com`).
-    *   Click **Save**.
-7.  **Re-deploy**:
-    *   Go back to the main app page.
-    *   Click **"Redeploy this version"**.
-    *   *Reason*: The environment variable only takes effect during the build process, so we need to run the build again.
+# Create .env
+cat > .env <<EOF
+DEEPGRAM_API_KEY=your_key
+OPENAI_API_KEY=your_key
+ELEVENLABS_API_KEY=your_key
+SERVER_HOST=0.0.0.0
+SERVER_PORT=8765
+ALLOWED_ORIGINS=*
+EOF
+
+docker build -t voice-assistant .
+docker run -d --name voice-assistant --restart unless-stopped -p 8765:8765 --env-file .env voice-assistant
+```
+
+### Step 4: Setup FREE SSL with Cloudflare
+
+```bash
+wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+sudo dpkg -i cloudflared-linux-amd64.deb
+cloudflared tunnel --url http://localhost:8765
+# Copy the https://random.trycloudflare.com URL
+```
+
+### Step 5: Update Frontend
+
+Update client/index.html:
+```javascript
+let wsUrl = 'wss://random.trycloudflare.com';
+```
+
+Upload and serve:
+```bash
+scp -i your-key.pem client/index.html ubuntu@<EC2-IP>:~/
+ssh -i your-key.pem ubuntu@<EC2-IP>
+python3 -m http.server 8000
+```
+
+Access: http://<EC2-IP>:8000
 
 ---
 
-## ✅ Setup Complete!
-Open the **Amplify Domain** (e.g., `https://main.xyz.amplifyapp.com`).
-Your Voice Assistant is now live and talking to your cloud backend! 🎤☁️
+## Production with Let's Encrypt (with domain)
+
+Follow Steps 1-3 above, then:
+
+### Get Domain
+- Buy from Namecheap ($1/year)
+- Point A record to EC2 IP
+
+### Install Nginx + SSL
+
+```bash
+sudo apt install -y nginx certbot python3-certbot-nginx
+sudo nano /etc/nginx/sites-available/voice-assistant
+```
+
+Config:
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    
+    location / {
+        root /var/www/html;
+        index index.html;
+    }
+    
+    location /ws {
+        proxy_pass http://localhost:8765;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+```
+
+```bash
+sudo ln -s /etc/nginx/sites-available/voice-assistant /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+sudo certbot --nginx -d your-domain.com
+```
+
+Deploy:
+```bash
+sudo cp client/index.html /var/www/html/
+```
+
+Update wsUrl to: wss://your-domain.com/ws
+
+Access: https://your-domain.com
+
+---
+
+## Cost: $15/month (EC2 t3.small) + SSL FREE

@@ -46,11 +46,12 @@ class VoiceAssistant:
             f"?encoding=linear16"
             f"&sample_rate=16000"
             f"&channels=1"
-            f"&model=nova-2-general"
-            f"&language=en-US"
-            f"&punctuate=true"
+            f"&model=nova-3"
+            f"&language=multi"
             f"&interim_results=false"
             f"&endpointing=1000"
+            f"&smart_format=true"
+            f"&numerals=true"
         )
         
         logger.info("🔌 Connecting to Deepgram...")
