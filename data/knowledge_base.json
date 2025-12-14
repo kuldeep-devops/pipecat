@@ -1,685 +1,113 @@
 {
-    "clinic_info": {
-      "name": "Levo Wellness Center",
-      "mission": "To provide holistic healthcare solutions that address physical, mental, and aesthetic well-being",
-      "approach": "Combining traditional and modern wellness practices for comprehensive care",
-      "location": "B-42, Second Floor, Green Park Extension, New Delhi - 110016",
-      "operating_since": "2018",
-      "operating_hours": {
-        "monday_to_saturday": "10:00 AM - 8:00 PM",
-        "sunday": "11:00 AM - 6:00 PM"
-      },
-      "contact": {
-        "main_phone": "+91-11-4567-8900",
-        "whatsapp": "+91-98765-43210",
-        "emergency": "+91-98765-43211",
-        "email_general": "info@levowellness.com",
-        "email_bookings": "bookings@levowellness.com",
-        "email_feedback": "feedback@levowellness.com",
-        "website": "www.levowellness.com",
-        "social_media": {
-          "instagram": "@levowellness",
-          "facebook": "/LevoWellnessCenter",
-          "youtube": "Levo Wellness"
+  "clinic_info": {
+    "name": "Levo Wellness Center",
+    "location": "Green Park, New Delhi",
+    "operating_hours": {
+      "monday_to_saturday": "10:00 AM - 8:00 PM",
+      "sunday": "11:00 AM - 6:00 PM"
+    },
+    "contact": {
+      "main_phone": "+91-11-4567-8900",
+      "whatsapp": "+91-98765-43210",
+      "email": "info@levowellness.com"
+    }
+  },
+  "greeting_message": {
+    "primary": "Welcome to Lay-vo Wellness Center. Your wellness journey starts here. How can I help you today?"
+  },
+  "departments": {
+    "salon": {
+      "name": "Salon Services",
+      "services": {
+        "hair": {
+          "name": "Hair Services",
+          "stylist": "Radhika Mehta",
+          "services_offered": ["Haircuts", "Coloring", "Hair Treatments"],
+          "price_range": {"min": 500, "max": 8000, "currency": "INR"},
+          "duration": "30 mins - 3 hours"
+        },
+        "spa": {
+          "name": "SPA Services",
+          "therapist": "Neha Verma",
+          "services_offered": ["Swedish Massage", "Deep Tissue", "Aromatherapy"],
+          "price_range": {"min": 1500, "max": 12000, "currency": "INR"},
+          "duration": "60 mins - 3 hours"
         }
       }
     },
-    "greeting_message": {
-      "primary": "🌿 Namaste! Welcome to Levo Wellness.\n\nYour wellness journey starts here. How can I help you today?"
-    },
-    "departments": {
-      "salon": {
-        "name": "Salon Services",
-        "services": {
-          "hair": {
-            "name": "Hair Services",
-            "lead_stylist": "Radhika Mehta",
-            "experience": "15+ years",
-            "senior_stylists": ["Amit Sharma", "Priya Kapoor"],
-            "services_offered": [
-              "Haircuts & Styling (Men, Women, Children)",
-              "Hair Coloring (Full, Highlights, Balayage, Ombre)",
-              "Hair Treatments (Keratin, Smoothening, Deep Conditioning, Olaplex)",
-              "Scalp Treatments (Anti-dandruff, Hair Fall Control)",
-              "Bridal/Special Occasion Styling",
-              "Hair Extensions & Bonding"
-            ],
-            "duration": "30 minutes - 3 hours",
-            "price_range": {
-              "min": 500,
-              "max": 8000,
-              "currency": "INR"
-            },
-            "available_slots": {
-              "monday_to_saturday": [
-                "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM",
-                "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM",
-                "6:00 PM", "7:00 PM"
-              ],
-              "sunday": [
-                "11:00 AM", "12:00 PM", "1:00 PM",
-                "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"
-              ]
-            }
-          },
-          "nail": {
-            "name": "Nail Services",
-            "nail_technician": "Sneha Patel",
-            "certification": "Certified Nail Artist",
-            "services_offered": [
-              "Manicure (Basic, Gel, French, Russian)",
-              "Pedicure (Basic, Spa, Medical, Foot Reflexology)",
-              "Nail Art & Extensions",
-              "Nail Health Treatments",
-              "Paraffin Wax Treatment"
-            ],
-            "duration": "30 minutes - 1.5 hours",
-            "price_range": {
-              "min": 400,
-              "max": 3000,
-              "currency": "INR"
-            },
-            "available_slots": {
-              "monday_to_saturday": [
-                "10:30 AM", "12:00 PM", "1:30 PM", "3:00 PM",
-                "4:30 PM", "6:00 PM", "7:30 PM"
-              ],
-              "sunday": [
-                "11:30 AM", "1:00 PM", "2:30 PM",
-                "4:00 PM", "5:30 PM"
-              ]
-            }
-          },
-          "spa": {
-            "name": "SPA Services",
-            "spa_manager": "Neha Verma",
-            "certification": "Certified Spa Therapist",
-            "therapists": ["Kavita Das", "Anjali Singh", "Ritu Malhotra"],
-            "services_offered": [
-              "Body Massages (Swedish, Deep Tissue, Aromatherapy, Hot Stone, Thai)",
-              "Body Scrubs & Wraps",
-              "Signature Facials",
-              "Relaxation Packages",
-              "Couples Spa Packages",
-              "Prenatal Massage"
-            ],
-            "duration": "60 minutes - 3 hours",
-            "price_range": {
-              "min": 1500,
-              "max": 12000,
-              "currency": "INR"
-            },
-            "available_slots": {
-              "monday_to_saturday": [
-                "10:00 AM", "12:00 PM", "2:00 PM",
-                "4:00 PM", "6:00 PM"
-              ],
-              "sunday": [
-                "11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM"
-              ]
-            }
-          }
-        }
-      },
-      "aesthetics": {
-        "name": "Aesthetics Services",
-        "services": {
-          "skin_health": {
-            "name": "Skin Health",
-            "consultant": "Dr. Anjali Khanna",
-            "services_offered": [
-              "Acne Treatment & Management",
-              "Anti-Aging Treatments (Botox, Fillers)",
-              "Pigmentation Correction",
-              "Chemical Peels (Glycolic, Salicylic, TCA)",
-              "Microdermabrasion",
-              "Laser Treatments (Hair Removal, Skin Resurfacing)",
-              "HydraFacial",
-              "Skin Rejuvenation",
-              "Mole & Wart Removal"
-            ],
-            "duration": "30 minutes - 2 hours",
-            "price_range": {
-              "min": 2000,
-              "max": 15000,
-              "currency": "INR"
-            },
-            "available_slots": {
-              "monday_to_saturday": [
-                "10:00 AM", "11:30 AM", "1:00 PM",
-                "2:30 PM", "4:00 PM", "5:30 PM"
-              ],
-              "sunday": "Closed"
-            }
-          },
-          "hand_body": {
-            "name": "Hand & Body Treatments",
-            "specialist": "Pooja Malhotra",
-            "services_offered": [
-              "Body Contouring (Cryolipolysis)",
-              "Cellulite Reduction",
-              "Stretch Mark Treatment",
-              "Body Polishing",
-              "Hand Rejuvenation",
-              "Anti-Aging Body Treatments",
-              "Skin Tightening Treatments"
-            ],
-            "duration": "45 minutes - 2 hours",
-            "price_range": {
-              "min": 2500,
-              "max": 10000,
-              "currency": "INR"
-            },
-            "available_slots": {
-              "monday_to_saturday": [
-                "11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM"
-              ],
-              "sunday": "Closed"
-            }
-          },
-          "holistic_wellness": {
-            "name": "Holistic Wellness",
-            "coordinator": "Meera Chatterjee",
-            "services_offered": [
-              "Stress Management Programs",
-              "Detox Therapies",
-              "Energy Healing (Reiki)",
-              "Holistic Skin Care",
-              "Wellness Consultations",
-              "Personalized Wellness Plans"
-            ],
-            "duration": "60 minutes - 90 minutes",
-            "price_range": {
-              "min": 1500,
-              "max": 5000,
-              "currency": "INR"
-            },
-            "available_slots": {
-              "monday_wednesday_friday": [
-                "10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM"
-              ],
-              "tuesday_thursday": [
-                "11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM"
-              ]
-            }
-          }
-        }
-      },
-      "wellness": {
-        "name": "Wellness Services",
-        "services": {
-          "pilates": {
-            "name": "Pilates",
-            "instructor": "Natasha Kohli",
-            "certification": "Stott Pilates Certified",
-            "classes_offered": [
-              "Beginner Pilates",
-              "Intermediate Pilates",
-              "Advanced Pilates",
-              "Reformer Pilates",
-              "Mat Pilates",
-              "Private Sessions",
-              "Group Classes (Max 8 people)"
-            ],
-            "duration": "45 minutes - 60 minutes",
-            "pricing": {
-              "single_session": {
-                "min": 800,
-                "max": 2000,
-                "currency": "INR"
-              },
-              "package_10_sessions": {
-                "price": 6000,
-                "currency": "INR"
-              }
-            },
-            "available_slots": {
-              "monday_to_saturday": {
-                "morning": ["7:00 AM", "8:30 AM", "10:00 AM"],
-                "evening": ["5:00 PM", "6:30 PM", "7:30 PM"]
-              },
-              "sunday": ["8:00 AM", "10:00 AM", "5:00 PM"]
-            }
-          },
-          "yoga": {
-            "name": "Yoga",
-            "instructor": "Vikram Nair",
-            "certification": "500-hour RYT",
-            "assistant_instructor": "Shweta Iyer",
-            "classes_offered": [
-              "Hatha Yoga",
-              "Vinyasa Flow",
-              "Ashtanga Yoga",
-              "Yin Yoga",
-              "Prenatal Yoga",
-              "Therapeutic Yoga",
-              "Chair Yoga (Seniors)",
-              "Private Sessions",
-              "Group Classes (Max 12 people)"
-            ],
-            "duration": "60 minutes - 90 minutes",
-            "pricing": {
-              "single_session": {
-                "min": 600,
-                "max": 1800,
-                "currency": "INR"
-              },
-              "package_10_sessions": {
-                "price": 5000,
-                "currency": "INR"
-              }
-            },
-            "available_slots": {
-              "monday_to_sunday": {
-                "morning": ["6:00 AM", "7:30 AM", "9:00 AM"],
-                "evening": ["5:30 PM", "7:00 PM"]
-              },
-              "special_sunday": {
-                "class": "Power Yoga",
-                "time": "8:30 AM"
-              }
-            }
-          },
-          "meditation": {
-            "name": "Meditation",
-            "expert": "Ananya Desai",
-            "certification": "Vipassana Teacher",
-            "sessions_offered": [
-              "Guided Meditation",
-              "Mindfulness Meditation (MBSR)",
-              "Breathwork Sessions (Pranayama)",
-              "Stress Relief Meditation",
-              "Sleep Meditation",
-              "Chakra Meditation",
-              "Sound Healing",
-              "Group Meditation",
-              "One-on-One Sessions"
-            ],
-            "duration": "30 minutes - 60 minutes",
-            "pricing": {
-              "single_session": {
-                "min": 500,
-                "max": 1500,
-                "currency": "INR"
-              },
-              "package_10_sessions": {
-                "price": 4000,
-                "currency": "INR"
-              }
-            },
-            "available_slots": {
-              "monday_wednesday_friday": {
-                "morning": ["6:30 AM", "8:00 AM"],
-                "evening": ["6:00 PM", "7:30 PM"]
-              },
-              "tuesday_thursday": {
-                "morning": ["7:00 AM"],
-                "evening": ["6:30 PM"]
-              },
-              "saturday_sunday": {
-                "morning": ["7:00 AM", "9:00 AM"],
-                "evening": ["5:00 PM"]
-              }
-            }
-          }
+    "wellness": {
+      "name": "Wellness Services",
+      "services": {
+        "yoga": {
+          "name": "Yoga Classes",
+          "instructor": "Vikram Nair",
+          "classes_offered": ["Hatha Yoga", "Vinyasa Flow", "Prenatal Yoga"],
+          "price": 600,
+          "duration": "60 minutes"
+        },
+        "meditation": {
+          "name": "Meditation Sessions",
+          "instructor": "Ananya Desai",
+          "sessions_offered": ["Guided Meditation", "Mindfulness", "Breathwork"],
+          "price": 500,
+          "duration": "30 minutes"
         }
       }
-    },
-    "doctors": {
-      "dermatologist": {
-        "name": "Dr. Anjali Khanna",
-        "qualification": "MBBS, MD (Dermatology), Fellowship in Cosmetic Dermatology",
-        "experience_years": 12,
-        "specialization": [
-          "Acne and acne scars treatment",
-          "Skin diseases and disorders (Psoriasis, Eczema, Rosacea)",
-          "Hair loss treatment (PRP, Mesotherapy)",
-          "Anti-aging treatments (Botox, Fillers, Thread Lift)",
-          "Laser treatments",
-          "Cosmetic dermatology",
-          "Vitiligo treatment",
-          "Chemical peels"
-        ],
-        "consultation_fee": 1200,
-        "follow_up_fee": 800,
-        "currency": "INR",
-        "available_days_slots": {
-          "monday": ["2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"],
-          "wednesday": ["2:30 PM", "3:30 PM", "4:30 PM", "5:30 PM"],
-          "friday": ["2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"],
-          "saturday": ["10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM"]
-        }
-      },
-      "ayurveda": {
-        "name": "Dr. Ramesh Kumar Sharma",
-        "qualification": "BAMS, MD (Kayachikitsa), Panchakarma Specialist",
-        "experience_years": 18,
-        "specialization": [
-          "Dosha assessment and balancing (Vata, Pitta, Kapha)",
-          "Panchakarma therapies (Detoxification)",
-          "Herbal medicine consultation",
-          "Lifestyle and dietary counseling",
-          "Chronic disease management (Diabetes, Arthritis, Thyroid)",
-          "Detoxification programs",
-          "Stress and anxiety management",
-          "Digestive disorders",
-          "Women's health (PCOD, Menopause)"
-        ],
-        "consultation_fee": 1000,
-        "follow_up_fee": 600,
-        "currency": "INR",
-        "available_days_slots": {
-          "tuesday": ["10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM"],
-          "thursday": ["10:30 AM", "11:30 AM", "12:30 PM", "1:30 PM"],
-          "saturday": ["3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"],
-          "sunday": ["10:00 AM", "11:00 AM", "12:00 PM"]
-        }
-      },
-      "nutritionist": {
-        "name": "Ms. Priya Sengupta",
-        "qualification": "MSc (Clinical Nutrition & Dietetics), Registered Dietitian, Certified Diabetes Educator",
-        "experience_years": 10,
-        "specialization": [
-          "Weight management (Weight loss/gain)",
-          "Therapeutic diet planning",
-          "Sports nutrition",
-          "Disease-specific nutrition (Diabetes, PCOD, Thyroid, Heart Disease)",
-          "Gut health and IBS management",
-          "Customized meal plans",
-          "Pregnancy and lactation nutrition",
-          "Child nutrition",
-          "Geriatric nutrition"
-        ],
-        "consultation_fee": 1500,
-        "follow_up_fee": 800,
-        "meal_plan_package": {
-          "price": 5000,
-          "duration": "per month",
-          "includes": "weekly follow-ups"
-        },
-        "currency": "INR",
-        "available_days_slots": {
-          "monday": ["11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "4:00 PM"],
-          "wednesday": ["11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"],
-          "friday": ["10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM"],
-          "saturday": ["11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM"]
-        }
-      },
-      "pain_relief": {
-        "name": "Dr. Arjun Malhotra",
-        "qualification": "MBBS, MD (PMR), Certified Pain Management Specialist",
-        "experience_years": 14,
-        "specialization": [
-          "Chronic pain management",
-          "Sports injuries rehabilitation",
-          "Joint pain and arthritis",
-          "Back and neck pain (Cervical/Lumbar Spondylosis)",
-          "Post-surgical pain management",
-          "Frozen shoulder",
-          "Sciatica treatment",
-          "Trigger point therapy",
-          "Non-surgical pain treatments",
-          "Physiotherapy consultation"
-        ],
-        "consultation_fee": 1800,
-        "follow_up_fee": 1000,
-        "currency": "INR",
-        "available_days_slots": {
-          "tuesday": ["3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"],
-          "thursday": ["3:30 PM", "4:30 PM", "5:30 PM", "6:30 PM"],
-          "friday": ["11:00 AM", "12:00 PM", "1:00 PM"],
-          "sunday": ["2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"]
-        }
+    }
+  },
+  "doctors": {
+    "dermatologist": {
+      "name": "Dr. Anjali Khanna",
+      "qualification": "MD Dermatology",
+      "specialization": ["Acne Treatment", "Anti-aging", "Laser Treatments"],
+      "consultation_fee": 1200,
+      "available_days_slots": {
+        "monday": ["2:00 PM", "3:00 PM", "4:00 PM"],
+        "wednesday": ["2:30 PM", "3:30 PM", "4:30 PM"],
+        "friday": ["2:00 PM", "3:00 PM", "4:00 PM"]
       }
     },
-    "packages": {
-      "wellness_packages": [
-        {
-          "id": "wp001",
-          "name": "Complete Wellness Package",
-          "price": 12000,
-          "currency": "INR",
-          "validity": "3 months",
-          "includes": [
-            "12 Yoga/Pilates sessions",
-            "1 Nutrition Consultation + Follow-up",
-            "1 Ayurveda Consultation",
-            "2 Meditation sessions",
-            "10% discount on spa services"
-          ]
-        },
-        {
-          "id": "wp002",
-          "name": "Beauty & Relaxation Package",
-          "price": 8500,
-          "currency": "INR",
-          "includes": [
-            "1 Full Body Massage (90 min)",
-            "1 HydraFacial",
-            "1 Hair Spa Treatment",
-            "1 Manicure + Pedicure",
-            "Complimentary herbal tea"
-          ]
-        },
-        {
-          "id": "wp003",
-          "name": "Skin Transformation Package",
-          "price": 18000,
-          "currency": "INR",
-          "validity": "2 months",
-          "includes": [
-            "Initial consultation with Dr. Khanna",
-            "6 Chemical Peel sessions",
-            "2 HydraFacial treatments",
-            "Customized skincare kit",
-            "2 Follow-up consultations"
-          ]
-        },
-        {
-          "id": "wp004",
-          "name": "Holistic Health Package",
-          "price": 15000,
-          "currency": "INR",
-          "validity": "3 months",
-          "includes": [
-            "Ayurveda Consultation with Dr. Sharma",
-            "5 Panchakarma therapy sessions",
-            "Nutrition Consultation",
-            "8 Yoga sessions",
-            "Herbal supplement kit"
-          ]
-        },
-        {
-          "id": "wp005",
-          "name": "Pain Management Package",
-          "price": 10000,
-          "currency": "INR",
-          "includes": [
-            "Consultation with Dr. Malhotra",
-            "10 Physiotherapy sessions",
-            "2 Pain relief massages",
-            "Exercise plan",
-            "2 Follow-ups"
-          ]
-        },
-        {
-          "id": "wp006",
-          "name": "Bridal Package",
-          "price": 35000,
-          "currency": "INR",
-          "includes": [
-            "6 Pre-bridal facial sessions",
-            "2 Body polishing treatments",
-            "Bridal makeup trial",
-            "Bridal hair & makeup (wedding day)",
-            "Manicure + Pedicure + Waxing",
-            "1 Relaxation massage"
-          ]
-        }
-      ],
-      "memberships": [
-        {
-          "id": "mem001",
-          "tier": "Silver",
-          "price": 3000,
-          "billing": "per month",
-          "currency": "INR",
-          "benefits": [
-            "10% discount on all services",
-            "Priority booking",
-            "1 Free group wellness class per week",
-            "Quarterly wellness assessment"
-          ]
-        },
-        {
-          "id": "mem002",
-          "tier": "Gold",
-          "price": 5000,
-          "billing": "per month",
-          "currency": "INR",
-          "benefits": [
-            "15% discount on all services",
-            "Priority booking",
-            "Unlimited group wellness classes",
-            "1 Free consultation per quarter (any specialist)",
-            "Complimentary wellness workshops",
-            "Monthly meditation session"
-          ]
-        },
-        {
-          "id": "mem003",
-          "tier": "Platinum",
-          "price": 8000,
-          "billing": "per month",
-          "currency": "INR",
-          "benefits": [
-            "20% discount on all services",
-            "Priority booking & dedicated slot reservation",
-            "Unlimited group wellness classes",
-            "2 Free consultations per quarter",
-            "1 Free spa treatment per month",
-            "Access to exclusive events",
-            "Personal wellness coordinator"
-          ]
-        }
-      ]
-    },
-    "booking_policies": {
-      "advance_booking": "Recommended 24-48 hours in advance",
-      "same_day": "Subject to availability (call for confirmation)",
-      "cancellation": {
-        "notice_required": "12 hours",
-        "late_cancellation_charge": "50% of service fee"
-      },
-      "rescheduling": "Free rescheduling once; subject to availability",
-      "first_time_clients": "Arrive 15 minutes early for registration",
-      "consultation_required_for": [
-        "Laser treatments",
-        "Chemical peels",
-        "Aesthetic procedures"
-      ]
-    },
-    "payment_methods": [
-      "Cash",
-      "Credit/Debit Cards (Visa, Mastercard, RuPay)",
-      "UPI (Google Pay, PhonePe, Paytm)",
-      "Digital Wallets",
-      "EMI Options (for packages above ₹10,000)"
-    ],
-    "faqs": [
-      {
-        "question": "Do I need to book in advance?",
-        "answer": "We highly recommend booking 24-48 hours in advance to secure your preferred time slot. However, we do accept walk-ins based on availability."
-      },
-      {
-        "question": "What should I bring for my first visit?",
-        "answer": "Please bring a valid photo ID (Aadhaar/PAN/Driving License) and any relevant medical reports if you're consulting a doctor. Arrive 15 minutes early to complete our registration form."
-      },
-      {
-        "question": "Can I combine multiple services?",
-        "answer": "Absolutely! We encourage a holistic approach. Our team can create customized combination packages tailored to your needs. Popular combos include Yoga + Nutrition, Dermatology + Aesthetics, and Spa + Meditation."
-      },
-      {
-        "question": "Are your doctors certified and experienced?",
-        "answer": "Yes, all our medical professionals are fully qualified, registered practitioners with years of experience. They hold valid medical council registrations and regularly update their skills."
-      },
-      {
-        "question": "Do you offer couple/group packages?",
-        "answer": "Yes! We have special couple spa packages, group yoga/Pilates classes, and family wellness programs. Group discounts available for 3+ people."
-      },
-      {
-        "question": "What payment methods do you accept?",
-        "answer": "We accept all major payment methods: cash, credit/debit cards, UPI, digital wallets, and we also offer EMI options for packages above ₹10,000."
-      },
-      {
-        "question": "Is parking available?",
-        "answer": "Yes, we have dedicated parking space for our clients. Valet parking service is also available."
-      },
-      {
-        "question": "What is your cancellation policy?",
-        "answer": "Please inform us at least 12 hours before your appointment to cancel or reschedule without charges. Late cancellations may incur 50% of the service fee."
+    "nutritionist": {
+      "name": "Ms. Priya Sengupta",
+      "qualification": "MSc Clinical Nutrition",
+      "specialization": ["Weight Management", "Diabetes Diet", "PCOD Nutrition"],
+      "consultation_fee": 1500,
+      "available_days_slots": {
+        "monday": ["11:00 AM", "2:00 PM", "4:00 PM"],
+        "wednesday": ["11:00 AM", "2:00 PM", "4:00 PM"],
+        "saturday": ["11:00 AM", "12:00 PM", "1:00 PM"]
       }
-    ],
-    "emergency_contacts": {
-      "first_aid": "Available at reception",
-      "hospital_tie_up": "Max Hospital (2 km away)",
-      "ambulance": "+91-11-2345-6789",
-      "emergency_doctor": {
-        "name": "Dr. Khanna",
-        "phone": "+91-98765-00001"
-      }
-    },
-    "special_features": {
-      "corporate_wellness": {
-        "available": true,
-        "services": [
-          "On-site yoga/meditation sessions",
-          "Health screening camps",
-          "Stress management workshops",
-          "Nutrition counseling",
-          "Ergonomics consultation"
-        ],
-        "contact": "corporate@levowellness.com"
-      },
-      "workshops": {
-        "frequency": "Monthly",
-        "topics": [
-          "Healthy cooking",
-          "Stress management",
-          "Skincare routines",
-          "Posture correction",
-          "Women's health"
-        ]
-      },
-      "loyalty_program": {
-        "earning": "1 point = ₹100 spent",
-        "redemption": "100 points = ₹500 discount voucher",
-        "birthday_bonus": "Double points",
-        "referral_bonus": "50 points per successful referral"
-      }
-    },
-    "current_offers": [
+    }
+  },
+  "packages": {
+    "wellness_packages": [
       {
-        "name": "New Client Offer",
-        "discount": "20%",
-        "applicable_on": "First visit (any service)"
-      },
-      {
-        "name": "Weekend Special",
-        "discount": "15%",
-        "applicable_on": "Any spa package on weekends"
-      },
-      {
-        "name": "Festive Glow",
-        "description": "Skin treatments package",
+        "name": "Complete Wellness Package",
         "price": 12000,
-        "actual_worth": 15000,
-        "currency": "INR"
+        "validity": "3 months",
+        "includes": ["12 Yoga sessions", "Nutrition consultation", "2 Meditation sessions"]
       },
       {
-        "name": "Refer & Earn",
-        "description": "Refer 3 friends, get 1 free service (up to ₹2,000)"
+        "name": "Skin Care Package",
+        "price": 18000,
+        "validity": "2 months",
+        "includes": ["6 Chemical Peels", "2 HydraFacials", "Skincare kit"]
       }
     ]
-  }
-  
+  },
+  "booking_policies": {
+    "advance_booking": "24-48 hours recommended",
+    "cancellation_notice": "12 hours",
+    "late_cancellation_charge": "50% of service fee"
+  },
+  "faqs": [
+    {
+      "question": "Do I need to book in advance?",
+      "answer": "We recommend booking 24-48 hours in advance, but we accept walk-ins based on availability."
+    },
+    {
+      "question": "What are your operating hours?",
+      "answer": "We're open Monday to Saturday from 10 AM to 8 PM, and Sunday from 11 AM to 6 PM."
+    }
+  ]
+}
