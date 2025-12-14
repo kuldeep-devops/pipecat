@@ -123,26 +123,42 @@ class VoiceAssistant:
                                         'type': 'greeting',
                                         'text': greeting
                                     }))
-                                    # Send greeting TTS and wait for it to complete
-                                    await self.text_to_speech(greeting, websocket)
                                     
-                                    # Add greeting to conversation history so LLM knows it was sent
+                                    # Add greeting to conversation history BEFORE user message
+                                    # This helps LLM understand the greeting was already sent
                                     self.conversation_history.append({
                                         "role": "assistant",
                                         "content": greeting
                                     })
+                                    
+                                    # Add user message to history
+                                    self.conversation_history.append({
+                                        "role": "user",
+                                        "content": transcript
+                                    })
+                                    
+                                    # Add explicit instruction to NOT ask another question
+                                    self.conversation_history.append({
+                                        "role": "system",
+                                        "content": "REMINDER: The greeting already asked 'How can I help you today?' DO NOT ask 'How can I assist you today?' or any similar question. Just acknowledge and wait, or answer if the user has a specific request."
+                                    })
+                                    
                                     greeting_sent = True
                                     
+                                    # Send greeting TTS and wait for it to complete
+                                    await self.text_to_speech(greeting, websocket)
+                                    
                                     # Estimate greeting audio duration and wait for it to complete
-                                    # Average speech rate: ~150 words/min = 2.5 words/sec
-                                    # Add buffer for TTS generation and network delay
                                     word_count = len(greeting.split())
                                     estimated_duration = (word_count / 2.5) + 1.0  # seconds
                                     logger.info(f"⏳ Waiting {estimated_duration:.1f}s for greeting audio to complete...")
                                     await asyncio.sleep(estimated_duration)
-                                
-                                # Get LLM response (user message will be added inside this function)
-                                await self.get_llm_response(transcript, websocket)
+                                    
+                                    # Get LLM response (user message already added to history)
+                                    await self.get_llm_response_direct(websocket)
+                                else:
+                                    # Get LLM response (user message will be added inside this function)
+                                    await self.get_llm_response(transcript, websocket)
             
             # Run both tasks
             await asyncio.gather(
@@ -165,36 +181,66 @@ class VoiceAssistant:
                 "content": user_text
             })
             
-            logger.info("🧠 Calling OpenAI...")
-            
-            # Get response
-            response = self.openai_client.chat.completions.create(
-                model=self.openai_config.model,
-                messages=self.conversation_history,
-                max_tokens=self.openai_config.max_tokens,
-                temperature=self.openai_config.temperature
-            )
-            
-            assistant_text = response.choices[0].message.content
-            logger.info(f"💬 ASSISTANT: {assistant_text}")
-            
-            # Add to history
-            self.conversation_history.append({
-                "role": "assistant",
-                "content": assistant_text
-            })
-            
-            # Send to browser
-            await websocket.send(json.dumps({
-                'type': 'llm_text',
-                'text': assistant_text
-            }))
-            
-            # Generate speech
-            await self.text_to_speech(assistant_text, websocket)
+            await self._process_llm_response(websocket)
             
         except Exception as e:
             logger.error(f"❌ LLM error: {e}")
+    
+    async def get_llm_response_direct(self, websocket):
+        """Get LLM response when user message already in history"""
+        try:
+            await self._process_llm_response(websocket)
+        except Exception as e:
+            logger.error(f"❌ LLM error: {e}")
+    
+    async def _process_llm_response(self, websocket):
+        """Process LLM response (shared logic)"""
+        logger.info("🧠 Calling OpenAI...")
+        
+        # Filter out additional system messages from history (keep only the first one)
+        filtered_history = [self.conversation_history[0]]  # Keep initial system prompt
+        for msg in self.conversation_history[1:]:
+            if msg["role"] != "system":  # Skip additional system reminder messages
+                filtered_history.append(msg)
+        
+        # Get response
+        response = self.openai_client.chat.completions.create(
+            model=self.openai_config.model,
+            messages=filtered_history,
+            max_tokens=self.openai_config.max_tokens,
+            temperature=self.openai_config.temperature
+        )
+        
+        assistant_text = response.choices[0].message.content
+        logger.info(f"💬 ASSISTANT: {assistant_text}")
+        
+        # Check if response is asking redundant question after greeting
+        redundant_phrases = [
+            "how can i assist you",
+            "how can i help you",
+            "what can i do for you",
+            "what would you like to know or do"
+        ]
+        response_lower = assistant_text.lower()
+        if any(phrase in response_lower for phrase in redundant_phrases) and "?" in assistant_text:
+            # Replace with simple acknowledgment
+            assistant_text = "I'm here to help. What would you like to do?"
+            logger.warning("⚠️ Detected redundant question, replacing with acknowledgment")
+        
+        # Add to history
+        self.conversation_history.append({
+            "role": "assistant",
+            "content": assistant_text
+        })
+        
+        # Send to browser
+        await websocket.send(json.dumps({
+            'type': 'llm_text',
+            'text': assistant_text
+        }))
+        
+        # Generate speech
+        await self.text_to_speech(assistant_text, websocket)
     
     async def text_to_speech(self, text, websocket):
         """Convert text to speech using ElevenLabs"""
