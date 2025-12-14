@@ -4,6 +4,7 @@ Voice Assistant - Main logic for handling conversations
 
 import asyncio
 import os
+import re
 from loguru import logger
 from openai import OpenAI
 import requests
@@ -403,29 +404,111 @@ class VoiceAssistant:
                             logger.warning("⚠️ Detected 'let me check' without result, truncated")
                             break
         
-        # Check if booking confirmation says "with a doctor" or "with doctor" - should include actual doctor name
-        if "booked" in response_lower and ("with a doctor" in response_lower or "with doctor" in response_lower):
-            # Try to find doctor name from conversation history
-            doctor_keywords = ["dermatologist", "nutritionist", "ayurveda", "pain relief", "dr.", "doctor"]
-            doctor_names = {
+        # Check if booking confirmation has generic doctor reference - should include actual doctor name
+        if "booked" in response_lower:
+            doctor_patterns = {
+                "with a doctor": None,
+                "with doctor": None,
+                "with the doctor": None,
+                "the dermatologist": "Dr. Anjali Khanna",
+                "the nutritionist": "Ms. Priya Sengupta",
+                "the ayurveda doctor": "Dr. Rajesh Kumar",
+                "the pain relief doctor": "Dr. Arvind Singh",
                 "dermatologist": "Dr. Anjali Khanna",
                 "nutritionist": "Ms. Priya Sengupta",
                 "ayurveda": "Dr. Rajesh Kumar",
                 "pain relief": "Dr. Arvind Singh"
             }
             
-            # Search conversation history for doctor mentions
-            for msg in reversed(self.conversation_history[-5:]):  # Check last 5 messages
-                msg_content = msg.get("content", "").lower()
-                for keyword, doctor_name in doctor_names.items():
-                    if keyword in msg_content:
-                        # Replace "with a doctor" or "with doctor" with actual doctor name
-                        assistant_text = assistant_text.replace("with a doctor", f"with {doctor_name}")
-                        assistant_text = assistant_text.replace("with doctor", f"with {doctor_name}")
-                        logger.warning(f"⚠️ Replaced 'with doctor' with actual doctor name: {doctor_name}")
+            # Check for generic doctor references first
+            if any(pattern in response_lower for pattern in ["with a doctor", "with doctor", "with the doctor", "the doctor"]):
+                # Try to find doctor name from conversation history
+                doctor_info_map = {
+                    "dermatologist": {"name": "Dr. Anjali Khanna", "department": "Dermatologist"},
+                    "nutritionist": {"name": "Ms. Priya Sengupta", "department": "Nutritionist"},
+                    "ayurveda": {"name": "Dr. Rajesh Kumar", "department": "Ayurveda"},
+                    "pain relief": {"name": "Dr. Arvind Singh", "department": "Pain Relief"}
+                }
+                
+                # Search conversation history for doctor mentions
+                found_doctor_info = None
+                for msg in reversed(self.conversation_history[-10:]):  # Check last 10 messages
+                    msg_content = msg.get("content", "").lower()
+                    for keyword, doctor_info in doctor_info_map.items():
+                        if keyword in msg_content:
+                            found_doctor_info = doctor_info
+                            doctor_with_dept = f"{doctor_info['name']} ({doctor_info['department']})"
+                            # Replace generic doctor references with doctor name and department
+                            assistant_text = assistant_text.replace("with a doctor", f"with {doctor_with_dept}")
+                            assistant_text = assistant_text.replace("with doctor", f"with {doctor_with_dept}")
+                            assistant_text = assistant_text.replace("with the doctor", f"with {doctor_with_dept}")
+                            assistant_text = assistant_text.replace("the doctor", doctor_with_dept)
+                            logger.warning(f"⚠️ Replaced generic doctor reference with doctor and department: {doctor_with_dept}")
+                            break
+                    if found_doctor_info:
                         break
-                if "dr." in assistant_text.lower() or any(name.split()[1].lower() in assistant_text.lower() for name in doctor_names.values()):
-                    break
+            
+            # Check for specific doctor type references (e.g., "the Pain Relief doctor", "with the Pain Relief doctor")
+            # Handle patterns like "the [specialty] doctor" or "with the [specialty] doctor"
+            # Include both department and doctor name
+            specialty_patterns = {
+                "pain relief": {"name": "Dr. Arvind Singh", "department": "Pain Relief"},
+                "dermatologist": {"name": "Dr. Anjali Khanna", "department": "Dermatologist"},
+                "nutritionist": {"name": "Ms. Priya Sengupta", "department": "Nutritionist"},
+                "ayurveda": {"name": "Dr. Rajesh Kumar", "department": "Ayurveda"}
+            }
+            
+            for specialty, doctor_info in specialty_patterns.items():
+                doctor_name = doctor_info["name"]
+                department = doctor_info["department"]
+                doctor_with_dept = f"{doctor_name} ({department})"
+                
+                # Pattern: "the [specialty] doctor" (e.g., "the Pain Relief doctor")
+                pattern1 = f"the {specialty} doctor"
+                if pattern1 in response_lower:
+                    assistant_text = re.sub(
+                        rf"the\s+{re.escape(specialty)}\s+doctor",
+                        doctor_with_dept,
+                        assistant_text,
+                        flags=re.IGNORECASE
+                    )
+                    logger.warning(f"⚠️ Replaced 'the {specialty} doctor' with doctor and department: {doctor_with_dept}")
+                
+                # Pattern: "with the [specialty] doctor" (e.g., "with the Pain Relief doctor")
+                pattern2 = f"with the {specialty} doctor"
+                if pattern2 in response_lower:
+                    assistant_text = re.sub(
+                        rf"with\s+the\s+{re.escape(specialty)}\s+doctor",
+                        f"with {doctor_with_dept}",
+                        assistant_text,
+                        flags=re.IGNORECASE
+                    )
+                    logger.warning(f"⚠️ Replaced 'with the {specialty} doctor' with doctor and department: {doctor_with_dept}")
+                
+                # Pattern: "with [specialty]" (e.g., "with Pain Relief")
+                pattern3 = f"with {specialty}"
+                if pattern3 in response_lower and "booked" in response_lower:
+                    # Only replace if it's not already "with Dr." or "with Ms."
+                    if not re.search(rf"with\s+(Dr\.|Ms\.)\s+", assistant_text, re.IGNORECASE):
+                        assistant_text = re.sub(
+                            rf"with\s+{re.escape(specialty)}(?!\s+doctor)",
+                            f"with {doctor_with_dept}",
+                            assistant_text,
+                            flags=re.IGNORECASE
+                        )
+                        logger.warning(f"⚠️ Replaced 'with {specialty}' with doctor and department: {doctor_with_dept}")
+                
+                # Also handle cases where doctor name is already present but department is missing
+                if doctor_name in assistant_text and department not in assistant_text and "booked" in response_lower:
+                    # Add department in parentheses after doctor name if not already there
+                    if not re.search(rf"{re.escape(doctor_name)}\s*\([^)]*\)", assistant_text, re.IGNORECASE):
+                        assistant_text = re.sub(
+                            rf"({re.escape(doctor_name)})(?!\s*\([^)]*\))",
+                            rf"\1 ({department})",
+                            assistant_text,
+                            flags=re.IGNORECASE
+                        )
+                        logger.warning(f"⚠️ Added department to existing doctor name: {doctor_with_dept}")
         
         # Add to history
         self.conversation_history.append({

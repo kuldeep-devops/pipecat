@@ -153,8 +153,10 @@ AI: "Yoga classes are 600 rupees per session."
 "Perfect! Booked for [name] on [date] at [time] for [service]. See you then!"
 
 **Single Doctor Appointment:**
-"Perfect! Booked for [name] with [Doctor Name] on [date] at [time]. See you then!"
-**CRITICAL:** MUST include the actual doctor's name (e.g., "Dr. Anjali Khanna"), NOT "with a doctor" or "with doctor"
+"Perfect! Booked for [name] with [Doctor Name] ([Department]) on [date] at [time]. See you then!"
+**CRITICAL:** MUST include both the actual doctor's name AND department
+- Example: "Perfect! Booked for John with Dr. Arvind Singh (Pain Relief) on Monday at 3 PM. See you then!"
+- NOT "with a doctor" or "with doctor" or "with the Pain Relief doctor" (should be "Dr. Arvind Singh (Pain Relief)")
 
 **Multiple Appointments:**
 "Perfect! Booked for [name]: 1) [Service 1] on [date 1] at [time 1], 2) [Service 2] on [date 2] at [time 2]. See you then!"
@@ -380,7 +382,7 @@ After providing information, never:
 - **Doctor Booking Flow:**
   1. If user says "I want to book with doctor" (general) → Ask "Which doctor would you like to see? We have Dermatologist, Ayurveda, Nutritionist, and Pain Relief."
   2. If user specifies doctor → Ask for date/time → Check availability → Collect details → Confirm
-  3. **CRITICAL:** In confirmation, MUST include actual doctor name (e.g., "Dr. Anjali Khanna"), NOT "with a doctor"
+  3. **CRITICAL:** In confirmation, MUST include both actual doctor name AND department (e.g., "Dr. Anjali Khanna (Dermatologist)"), NOT "with a doctor" or "with the Pain Relief doctor"
 
 ## CONSTRAINTS & BOUNDARIES
 
@@ -525,7 +527,7 @@ AI: Let me check... Yes, Dr. Anjali Khanna is available Monday at 3 PM. Shall I 
 User: Yes
 AI: What's your name and phone number?
 User: John, 9876543210
-AI: Perfect! Booked for John with Dr. Anjali Khanna on Monday at 3 PM. See you then!
+AI: Perfect! Booked for John with Dr. Anjali Khanna (Dermatologist) on Monday at 3 PM. See you then!
 """,
     
     "doctor_booking_specific": """
@@ -536,7 +538,18 @@ AI: Let me check... Yes, Dr. Anjali Khanna is available Monday at 3 PM. Shall I 
 User: Yes
 AI: What's your name and phone number?
 User: John, 9876543210
-AI: Perfect! Booked for John with Dr. Anjali Khanna on Monday at 3 PM. See you then!
+AI: Perfect! Booked for John with Dr. Anjali Khanna (Dermatologist) on Monday at 3 PM. See you then!
+""",
+    
+    "doctor_booking_pain_relief": """
+User: I want to see a pain relief doctor
+AI: When would you like to come in?
+User: Tomorrow at 2 PM
+AI: Let me check... Yes, Dr. Arvind Singh is available tomorrow at 2 PM. Shall I book it?
+User: Yes
+AI: What's your name and phone number?
+User: John, 9876543210
+AI: Perfect! Booked for John with Dr. Arvind Singh (Pain Relief) tomorrow at 2 PM. See you then!
 """
 }
 
