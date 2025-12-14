@@ -74,20 +74,8 @@ class VoiceAssistant:
         # Send ready to browser
         await websocket.send(json.dumps({'type': 'ready'}))
         
-        # Send greeting message from knowledge base
-        greeting = self.kb.get_greeting(mode="voice_nano")
-        logger.info(f"👋 Sending greeting: {greeting}")
-        await websocket.send(json.dumps({
-            'type': 'greeting',
-            'text': greeting
-        }))
-        await self.text_to_speech(greeting, websocket)
-        
-        # Add greeting to conversation history so LLM knows it was sent
-        self.conversation_history.append({
-            "role": "assistant",
-            "content": greeting
-        })
+        # Flag to track if greeting has been sent (after first user message)
+        greeting_sent = False
         
         try:
             async def forward_audio():
@@ -108,6 +96,7 @@ class VoiceAssistant:
             
             async def process_transcriptions():
                 """Process transcriptions from Deepgram"""
+                nonlocal greeting_sent
                 async for message in dg_ws:
                     data = json.loads(message)
                     
@@ -125,6 +114,23 @@ class VoiceAssistant:
                                     'type': 'transcription',
                                     'text': transcript
                                 }))
+                                
+                                # Send greeting after first user message (only once)
+                                if not greeting_sent:
+                                    greeting = self.kb.get_greeting(mode="voice_nano")
+                                    logger.info(f"👋 Sending greeting after first message: {greeting}")
+                                    await websocket.send(json.dumps({
+                                        'type': 'greeting',
+                                        'text': greeting
+                                    }))
+                                    await self.text_to_speech(greeting, websocket)
+                                    
+                                    # Add greeting to conversation history so LLM knows it was sent
+                                    self.conversation_history.append({
+                                        "role": "assistant",
+                                        "content": greeting
+                                    })
+                                    greeting_sent = True
                                 
                                 # Get LLM response
                                 await self.get_llm_response(transcript, websocket)
