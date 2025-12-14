@@ -13,11 +13,11 @@
     }
   },
   "greeting_message": {
-    "voice_nano": "Welcome to Levo Wellness. Your wellness journey starts here.",
-    "voice_tiny": "Welcome to Levo Wellness. Your wellness journey starts here.",
-    "voice_minimal": "Welcome to Levo Wellness. Your wellness journey starts here.",
-    "voice": "Welcome to Levo Wellness. Your wellness journey starts here.",
-    "text": "Welcome to Levo Wellness.\n\nYour wellness journey starts here."
+    "voice_nano": "Welcome to Levo Wellness. We offer Salon, Aesthetics, Wellness, and Doctors. Your wellness journey starts here.",
+    "voice_tiny": "Welcome to Levo Wellness. We offer Salon, Aesthetics, Wellness, and Doctors. Your wellness journey starts here.",
+    "voice_minimal": "Welcome to Levo Wellness. We offer Salon, Aesthetics, Wellness, and Doctors. Your wellness journey starts here.",
+    "voice": "Welcome to Levo Wellness. We offer Salon, Aesthetics, Wellness, and Doctors. Your wellness journey starts here.",
+    "text": "Welcome to Levo Wellness.\n\nWe offer Salon, Aesthetics, Wellness, and Doctors.\n\nYour wellness journey starts here."
   },
   "departments": {
     "salon": {
