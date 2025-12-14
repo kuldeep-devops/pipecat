@@ -235,6 +235,7 @@ class VoiceAssistant:
         try:
             text_length = len(text)
             logger.info(f"🔊 Generating speech for text ({text_length} characters)...")
+            logger.info(f"📝 Full text: {text}")
             
             # Chunk text if it's too long (ElevenLabs limit is ~5000 chars, we use 4000 for safety)
             chunks = self._chunk_text(text, max_chars=4000)
@@ -292,8 +293,12 @@ class VoiceAssistant:
             
             logger.info(f"✅ Complete audio sent to browser ({total_chunks_sent} total audio chunks from {len(chunks)} text chunks)")
             
+            # Small delay to ensure last audio chunk is fully sent before signaling completion
+            await asyncio.sleep(0.2)
+            
             # Send completion signal to client
             await websocket.send(json.dumps({'type': 'tts_complete'}))
+            logger.info("📢 TTS completion signal sent to client")
                 
         except Exception as e:
             logger.error(f"❌ TTS error: {e}")

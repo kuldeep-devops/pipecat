@@ -736,9 +736,9 @@
             if (e.data instanceof Blob) {
                 state.audioChunks.push(e.data);
                 clearTimeout(window.playTimer);
-                // Increased timeout to ensure all chunks arrive, especially for long texts
-                // Longer texts will be chunked server-side, so we wait longer
-                const timeout = state.audioChunks.length > 10 ? 300 : 150;
+                // Increased timeout to ensure all chunks arrive
+                // Wait longer for more chunks, but tts_complete will override this
+                const timeout = state.audioChunks.length > 10 ? 500 : 300;
                 window.playTimer = setTimeout(playAudio, timeout);
             } else if (typeof e.data === 'string') {
                 const d = JSON.parse(e.data);
@@ -746,26 +746,23 @@
                 else if (d.type === 'greeting') {
                     // Greeting is sent once on connection, don't count as conversation
                     addMsg('AI', d.text, 'ai');
-                    // For long texts, wait a bit longer for audio chunks to arrive
-                    if (d.text && d.text.length > 500) {
-                        clearTimeout(window.playTimer);
-                        // Reset timer with longer delay for long texts
-                        window.playTimer = setTimeout(playAudio, 500);
-                    }
+                    // Wait for tts_complete or use longer timeout
+                    clearTimeout(window.playTimer);
+                    window.playTimer = setTimeout(playAudio, 400);
                 } else if (d.type === 'llm_text') {
                     addMsg('AI', d.text, 'ai');
                     state.stats.convs++;
                     els.convCount.textContent = state.stats.convs;
-                    // For long texts, wait a bit longer for audio chunks to arrive
-                    if (d.text && d.text.length > 500) {
-                        clearTimeout(window.playTimer);
-                        // Reset timer with longer delay for long texts
-                        window.playTimer = setTimeout(playAudio, 500);
-                    }
-                } else if (d.type === 'tts_complete') {
-                    // Signal that all TTS chunks have been sent
+                    // Wait for tts_complete signal - don't play yet, wait for all chunks
                     clearTimeout(window.playTimer);
-                    window.playTimer = setTimeout(playAudio, 200);
+                    // Use longer timeout as fallback, but tts_complete will trigger playback
+                    const timeout = d.text && d.text.length > 500 ? 600 : 400;
+                    window.playTimer = setTimeout(playAudio, timeout);
+                } else if (d.type === 'tts_complete') {
+                    // Signal that all TTS chunks have been sent - this is the definitive signal
+                    clearTimeout(window.playTimer);
+                    // Small delay to ensure last audio chunk is received
+                    window.playTimer = setTimeout(playAudio, 100);
                 }
             }
         }
