@@ -219,13 +219,25 @@ class VoiceAssistant:
             "how can i assist you",
             "how can i help you",
             "what can i do for you",
-            "what would you like to know or do"
+            "what would you like to know",
+            "what would you like",
+            "i can help you with",
+            "i can help you",
+            "what would you like to know or do",
+            "assist in booking"
         ]
         response_lower = assistant_text.lower()
-        if any(phrase in response_lower for phrase in redundant_phrases) and "?" in assistant_text:
-            # Replace with simple acknowledgment
-            assistant_text = "I'm here to help. What would you like to do?"
-            logger.warning("⚠️ Detected redundant question, replacing with acknowledgment")
+        # Check if it contains redundant phrases (especially after greeting)
+        # If it mentions helping or asking what user wants, it's likely redundant
+        if any(phrase in response_lower for phrase in redundant_phrases):
+            # If it's a question, replace with simple acknowledgment - NO question
+            if "?" in assistant_text:
+                assistant_text = "I'm here to help."
+                logger.warning("⚠️ Detected redundant question, replacing with simple acknowledgment")
+            # If it's a statement like "I can help you with...", also replace
+            elif "i can help" in response_lower or "i can assist" in response_lower:
+                assistant_text = "I'm here to help."
+                logger.warning("⚠️ Detected redundant help statement, replacing with simple acknowledgment")
         
         # Add to history
         self.conversation_history.append({
