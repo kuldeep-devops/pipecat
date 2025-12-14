@@ -239,6 +239,42 @@ class VoiceAssistant:
                 assistant_text = "I'm here to help."
                 logger.warning("⚠️ Detected redundant help statement, replacing with simple acknowledgment")
         
+        # Check for "hold on" or "wait" phrases - AI should respond immediately, not ask user to wait
+        delay_phrases = [
+            "i'll need a moment",
+            "please hold on",
+            "hold on",
+            "wait a moment",
+            "give me a moment",
+            "one moment",
+            "just a moment",
+            "please wait"
+        ]
+        if any(phrase in response_lower for phrase in delay_phrases):
+            # This is a delay phrase - the AI should not say this, it should just provide the info immediately
+            # Remove the delay phrase and keep only the actual information/action
+            # If the response is ONLY a delay phrase, replace it with a prompt to actually respond
+            sentences = assistant_text.split('. ')
+            # Filter out sentences containing delay phrases
+            filtered_sentences = [s for s in sentences if not any(phrase in s.lower() for phrase in delay_phrases)]
+            
+            if filtered_sentences:
+                # Keep the non-delay sentences
+                assistant_text = '. '.join(filtered_sentences)
+                if not assistant_text.rstrip().endswith(('.', '!', '?')):
+                    assistant_text += '.'
+            else:
+                # Response was only delay phrases - check what user asked for
+                user_query = self.conversation_history[-1].get("content", "").lower() if self.conversation_history else ""
+                if any(word in user_query for word in ["available", "book", "appointment", "slot", "time", "when"]):
+                    # User asked about availability - should have been answered immediately
+                    assistant_text = "Checking availability."
+                    logger.warning("⚠️ Detected delay phrase for availability check, should provide result immediately")
+                else:
+                    # Replace with simple acknowledgment
+                    assistant_text = "I'm here to help."
+                    logger.warning("⚠️ Detected delay phrase, replacing with acknowledgment")
+        
         # Check if service listing includes too much detail (prices, availability when not asked)
         # If user asked "What services are available?" and response includes prices/details, simplify it
         if "what services" in self.conversation_history[-1].get("content", "").lower() or "services available" in self.conversation_history[-1].get("content", "").lower():
@@ -287,6 +323,22 @@ class VoiceAssistant:
                     first_point = parts[1].split(',')[0].strip() if ',' in parts[1] else parts[1].split('.')[0].strip()
                     assistant_text = f"{intro}: {first_point}."
                     logger.warning(f"⚠️ Response too wordy ({word_count} words), shortened")
+        
+        # Check if response continues after providing information (should STOP and WAIT)
+        # If response contains "Let me confirm..." or "Let me check..." after already providing info, truncate
+        response_lower = assistant_text.lower()
+        # Check if response has multiple sentences and contains continuation phrases
+        sentences = assistant_text.split('. ')
+        if len(sentences) > 1:
+            # Check if later sentences contain continuation phrases
+            continuation_phrases = ["let me confirm", "let me check", "let me verify", "i'll confirm", "i'll check"]
+            for i, sentence in enumerate(sentences[1:], start=1):
+                sentence_lower = sentence.lower()
+                if any(phrase in sentence_lower for phrase in continuation_phrases):
+                    # Truncate at the sentence before the continuation
+                    assistant_text = '. '.join(sentences[:i]) + '.'
+                    logger.warning("⚠️ Detected continuation after providing info, truncated to stop and wait")
+                    break
         
         # Add to history
         self.conversation_history.append({
