@@ -13,11 +13,11 @@
     }
   },
   "greeting_message": {
-    "voice_nano": "Welcome to Levo Wellness. Your wellness journey starts here. How can I help you today?",
-    "voice_tiny": "Welcome to Levo Wellness. Your wellness journey starts here. How can I help you today?",
-    "voice_minimal": "Welcome to Levo Wellness. Your wellness journey starts here. How can I help you today?",
-    "voice": "Welcome to Levo Wellness. Your wellness journey starts here. How can I help you today?",
-    "text": "Welcome to Levo Wellness.\n\nYour wellness journey starts here. How can I help you today?"
+    "voice_nano": "Welcome to Levo Wellness. Your wellness journey starts here.",
+    "voice_tiny": "Welcome to Levo Wellness. Your wellness journey starts here.",
+    "voice_minimal": "Welcome to Levo Wellness. Your wellness journey starts here.",
+    "voice": "Welcome to Levo Wellness. Your wellness journey starts here.",
+    "text": "Welcome to Levo Wellness.\n\nYour wellness journey starts here."
   },
   "services": {
     "salon": {
