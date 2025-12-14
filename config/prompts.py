@@ -15,26 +15,26 @@ Note: Pronounce "Levo" as "Lay-vo" for clear audio.
 
 ## Available Services
 
-**Salon:**
-- Hair Services (₹500-8000): Haircuts, Coloring, Treatments
-- SPA (₹1500-12000): Swedish, Deep Tissue, Aromatherapy
+Salon:
+- Hair Services (rupees 500-8000): Haircuts, Coloring, Treatments
+- SPA (rupees 1500-12000): Swedish, Deep Tissue, Aromatherapy
 
-**Wellness:**
-- Yoga (₹600): Hatha, Vinyasa, Prenatal
-- Meditation (₹500): Guided, Mindfulness, Breathwork
+Wellness:
+- Yoga (rupees 600): Hatha, Vinyasa, Prenatal
+- Meditation (rupees 500): Guided, Mindfulness, Breathwork
 
-**Doctors:**
-- Dr. Anjali Khanna (Dermatologist): ₹1200 - Mon/Wed/Fri
-- Ms. Priya Sengupta (Nutritionist): ₹1500 - Mon/Wed/Sat
+Doctors:
+- Dr. Anjali Khanna (Dermatologist): rupees 1200 - Mon/Wed/Fri
+- Ms. Priya Sengupta (Nutritionist): rupees 1500 - Mon/Wed/Sat
 
-**Packages:**
-- Complete Wellness: ₹12,000 (3 months)
-- Skin Care: ₹18,000 (2 months)
+Packages:
+- Complete Wellness: rupees 12,000 (3 months)
+- Skin Care: rupees 18,000 (2 months)
 
 ## Contact
-📞 +91-11-4567-8900
-📍 Green Park, New Delhi
-🕒 Mon-Sat: 10 AM-8 PM | Sun: 11 AM-6 PM
+Phone: +91-11-4567-8900
+Location: Green Park, New Delhi
+Hours: Mon-Sat: 10 AM-8 PM | Sun: 11 AM-6 PM
 
 ## Booking Rules
 - Book 24-48 hours in advance
@@ -79,7 +79,7 @@ def get_short_greeting():
 # Alternative greetings for different scenarios
 GREETING_VARIANTS = {
     "voice": "Welcome to Lay-vo Wellness Center. Your wellness journey starts here. How can I help you today?",
-    "text": "🌿 Welcome to Levo Wellness Center!\n\nYour wellness journey starts here. How can I help you today?",
+    "text": "Welcome to Levo Wellness Center!\n\nYour wellness journey starts here. How can I help you today?",
     "short": "Hello! Welcome to Levo Wellness. How may I assist you?",
     "casual": "Hi there! Welcome to Levo Wellness. What brings you in today?"
 }

@@ -39,7 +39,7 @@ class LevoWellnessDemoKB:
         if mode == "voice":
             return "Welcome to Lay-vo Wellness Center. Your wellness journey starts here. How can I help you today?"
         else:
-            return "🌿 Welcome to Levo Wellness Center!\n\nYour wellness journey starts here. How can I help you today?"
+            return "Welcome to Levo Wellness Center!\n\nYour wellness journey starts here. How can I help you today?"
 
     def get_clinic_info(self):
         """Get basic clinic information"""
@@ -104,8 +104,8 @@ class LevoWellnessDemoKB:
         
         # Basic info
         info = self.get_clinic_info()
-        parts.append(f"\n📍 Location: {info.get('location', 'N/A')}")
-        parts.append(f"📞 Phone: {info.get('contact', {}).get('main_phone', 'N/A')}")
+        parts.append(f"\nLocation: {info.get('location', 'N/A')}")
+        parts.append(f"Phone: {info.get('contact', {}).get('main_phone', 'N/A')}")
         
         # If query is provided, return relevant context only
         if user_query:
@@ -115,27 +115,27 @@ class LevoWellnessDemoKB:
             if any(word in query_lower for word in ['doctor', 'dermatologist', 'nutritionist', 'appointment']):
                 parts.append("\n### Doctors")
                 for specialty, doctor in self.get_all_doctors().items():
-                    parts.append(f"- {doctor['name']} ({specialty}): ₹{doctor['consultation_fee']}")
+                    parts.append(f"- {doctor['name']} ({specialty}): rupees {doctor['consultation_fee']}")
             
             # Service queries
             if any(word in query_lower for word in ['service', 'massage', 'hair', 'spa', 'yoga', 'meditation']):
                 parts.append("\n### Services")
                 for dept_name, services in self.get_services().items():
                     for service in services.values():
-                        price = service.get('price') or f"₹{service.get('price_range', {}).get('min', 0)}-{service.get('price_range', {}).get('max', 0)}"
+                        price = service.get('price') or f"rupees {service.get('price_range', {}).get('min', 0)}-{service.get('price_range', {}).get('max', 0)}"
                         parts.append(f"- {service['name']}: {price}")
             
             # Package queries
             if 'package' in query_lower:
                 parts.append("\n### Packages")
                 for pkg in self.get_packages():
-                    parts.append(f"- {pkg['name']}: ₹{pkg['price']}")
+                    parts.append(f"- {pkg['name']}: rupees {pkg['price']}")
         
         else:
             # Return full context
             parts.append("\n### Doctors")
             for doctor in self.get_all_doctors().values():
-                parts.append(f"- {doctor['name']}: ₹{doctor['consultation_fee']}")
+                parts.append(f"- {doctor['name']}: rupees {doctor['consultation_fee']}")
             
             parts.append("\n### Services")
             for dept_name, services in self.get_services().items():
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     print("\n2. DOCTORS:")
     print("-" * 60)
     for specialty, doctor in kb.get_all_doctors().items():
-        print(f"- {doctor['name']} ({specialty}): ₹{doctor['consultation_fee']}")
+        print(f"- {doctor['name']} ({specialty}): rupees {doctor['consultation_fee']}")
     
     print("\n3. SERVICES:")
     print("-" * 60)
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     print("\n4. PACKAGES:")
     print("-" * 60)
     for pkg in kb.get_packages():
-        print(f"- {pkg['name']}: ₹{pkg['price']}")
+        print(f"- {pkg['name']}: rupees {pkg['price']}")
     
     print("\n5. SMART CONTEXT:")
     print("-" * 60)
@@ -184,5 +184,5 @@ if __name__ == "__main__":
     print(f"\n{context}")
     
     print("\n" + "=" * 60)
-    print("✅ Demo KB test completed!")
+    print("Demo KB test completed!")
     print("=" * 60)
