@@ -123,6 +123,7 @@ class VoiceAssistant:
                                         'type': 'greeting',
                                         'text': greeting
                                     }))
+                                    # Send greeting TTS and wait for it to complete
                                     await self.text_to_speech(greeting, websocket)
                                     
                                     # Add greeting to conversation history so LLM knows it was sent
@@ -131,6 +132,14 @@ class VoiceAssistant:
                                         "content": greeting
                                     })
                                     greeting_sent = True
+                                    
+                                    # Estimate greeting audio duration and wait for it to complete
+                                    # Average speech rate: ~150 words/min = 2.5 words/sec
+                                    # Add buffer for TTS generation and network delay
+                                    word_count = len(greeting.split())
+                                    estimated_duration = (word_count / 2.5) + 1.0  # seconds
+                                    logger.info(f"⏳ Waiting {estimated_duration:.1f}s for greeting audio to complete...")
+                                    await asyncio.sleep(estimated_duration)
                                 
                                 # Get LLM response (user message will be added inside this function)
                                 await self.get_llm_response(transcript, websocket)
@@ -225,6 +234,13 @@ class VoiceAssistant:
                         await websocket.send(chunk)
                 
                 logger.info(f"✅ Audio sent to browser ({chunk_count} chunks)")
+                
+                # Small delay to ensure last audio chunk is fully sent
+                await asyncio.sleep(0.2)
+                
+                # Send completion signal to client
+                await websocket.send(json.dumps({'type': 'tts_complete'}))
+                logger.info("📢 TTS completion signal sent to client")
             else:
                 logger.error(f"❌ TTS error: {response.status_code} - {response.text}")
                 
