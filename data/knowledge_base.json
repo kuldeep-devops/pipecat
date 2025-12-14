@@ -13,101 +13,122 @@
     }
   },
   "greeting_message": {
-    "primary": "Welcome to Levo Wellness Center. Your wellness journey starts here. How can I help you today?"
+    "voice_nano": "Welcome to Levo Wellness. Your wellness journey starts here. How can I help you today?",
+    "voice_tiny": "Welcome to Levo Wellness. Your wellness journey starts here. How can I help you today?",
+    "voice_minimal": "Welcome to Levo Wellness. Your wellness journey starts here. How can I help you today?",
+    "voice": "Welcome to Levo Wellness. Your wellness journey starts here. How can I help you today?",
+    "text": "Welcome to Levo Wellness.\n\nYour wellness journey starts here. How can I help you today?"
   },
-  "departments": {
+  "services": {
     "salon": {
-      "name": "Salon Services",
-      "services": {
-        "hair": {
-          "name": "Hair Services",
-          "stylist": "Radhika Mehta",
-          "services_offered": ["Haircuts", "Coloring", "Hair Treatments"],
-          "price_range": {"min": 500, "max": 8000, "currency": "INR"},
-          "duration": "30 mins - 3 hours"
-        },
-        "spa": {
-          "name": "SPA Services",
-          "therapist": "Neha Verma",
-          "services_offered": ["Swedish Massage", "Deep Tissue", "Aromatherapy"],
-          "price_range": {"min": 1500, "max": 12000, "currency": "INR"},
-          "duration": "60 mins - 3 hours"
-        }
+      "hair": {
+        "name": "Hair Services",
+        "short_name": "haircut",
+        "staff": "Radhika Mehta",
+        "types": ["Haircuts", "Coloring", "Treatments"],
+        "price_range": {"min": 500, "max": 8000},
+        "duration": "30 mins - 3 hours",
+        "availability": "Mon-Sat: 10 AM - 8 PM, Sun: 11 AM - 6 PM"
+      },
+      "spa": {
+        "name": "SPA Services",
+        "short_name": "massage",
+        "staff": "Neha Verma",
+        "types": ["Swedish Massage", "Deep Tissue", "Aromatherapy"],
+        "price_range": {"min": 1500, "max": 12000},
+        "duration": "60 mins - 3 hours",
+        "availability": "Mon-Sat: 10 AM - 8 PM, Sun: 11 AM - 6 PM"
       }
     },
     "wellness": {
-      "name": "Wellness Services",
-      "services": {
-        "yoga": {
-          "name": "Yoga Classes",
-          "instructor": "Vikram Nair",
-          "classes_offered": ["Hatha Yoga", "Vinyasa Flow", "Prenatal Yoga"],
-          "price": 600,
-          "duration": "60 minutes"
-        },
-        "meditation": {
-          "name": "Meditation Sessions",
-          "instructor": "Ananya Desai",
-          "sessions_offered": ["Guided Meditation", "Mindfulness", "Breathwork"],
-          "price": 500,
-          "duration": "30 minutes"
-        }
+      "yoga": {
+        "name": "Yoga Classes",
+        "short_name": "yoga",
+        "instructor": "Vikram Nair",
+        "types": ["Hatha", "Vinyasa", "Prenatal"],
+        "price": 600,
+        "duration": "60 minutes",
+        "availability": "Daily: 6 AM, 7:30 AM, 5:30 PM, 7 PM"
+      },
+      "meditation": {
+        "name": "Meditation",
+        "short_name": "meditation",
+        "instructor": "Ananya Desai",
+        "types": ["Guided", "Mindfulness", "Breathwork"],
+        "price": 500,
+        "duration": "30 minutes",
+        "availability": "Daily: 7 AM, 6 PM, 7:30 PM"
       }
     }
   },
   "doctors": {
     "dermatologist": {
       "name": "Dr. Anjali Khanna",
+      "short_name": "skin doctor",
       "qualification": "MD Dermatology",
-      "specialization": ["Acne Treatment", "Anti-aging", "Laser Treatments"],
+      "specialization": ["Acne", "Anti-aging", "Laser Treatments"],
       "consultation_fee": 1200,
-      "available_days_slots": {
-        "monday": ["2:00 PM", "3:00 PM", "4:00 PM"],
-        "wednesday": ["2:30 PM", "3:30 PM", "4:30 PM"],
-        "friday": ["2:00 PM", "3:00 PM", "4:00 PM"]
+      "available_days": ["monday", "wednesday", "friday"],
+      "slots": {
+        "monday": ["2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"],
+        "wednesday": ["2:30 PM", "3:30 PM", "4:30 PM", "5:30 PM"],
+        "friday": ["2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"]
       }
     },
     "nutritionist": {
       "name": "Ms. Priya Sengupta",
+      "short_name": "diet expert",
       "qualification": "MSc Clinical Nutrition",
-      "specialization": ["Weight Management", "Diabetes Diet", "PCOD Nutrition"],
+      "specialization": ["Weight Management", "Diabetes", "PCOD"],
       "consultation_fee": 1500,
-      "available_days_slots": {
+      "available_days": ["monday", "wednesday", "saturday"],
+      "slots": {
         "monday": ["11:00 AM", "2:00 PM", "4:00 PM"],
-        "wednesday": ["11:00 AM", "2:00 PM", "4:00 PM"],
+        "wednesday": ["11:00 AM", "2:00 PM", "4:00 PM", "5:00 PM"],
         "saturday": ["11:00 AM", "12:00 PM", "1:00 PM"]
       }
     }
   },
   "packages": {
-    "wellness_packages": [
-      {
-        "name": "Complete Wellness Package",
-        "price": 12000,
-        "validity": "3 months",
-        "includes": ["12 Yoga sessions", "Nutrition consultation", "2 Meditation sessions"]
-      },
-      {
-        "name": "Skin Care Package",
-        "price": 18000,
-        "validity": "2 months",
-        "includes": ["6 Chemical Peels", "2 HydraFacials", "Skincare kit"]
-      }
-    ]
-  },
-  "booking_policies": {
-    "advance_booking": "24-48 hours recommended",
-    "cancellation_notice": "12 hours",
-    "late_cancellation_charge": "50% of service fee"
-  },
-  "faqs": [
-    {
-      "question": "Do I need to book in advance?",
-      "answer": "We recommend booking 24-48 hours in advance, but we accept walk-ins based on availability."
+    "wellness": {
+      "name": "Complete Wellness Package",
+      "price": 12000,
+      "validity": "3 months",
+      "summary": "12 Yoga sessions, Nutrition consultation, 2 Meditation sessions"
     },
-    {
-      "question": "What are your operating hours?",
-      "answer": "We're open Monday to Saturday from 10 AM to 8 PM, and Sunday from 11 AM to 6 PM."
+    "skincare": {
+      "name": "Skin Care Package",
+      "price": 18000,
+      "validity": "2 months",
+      "summary": "6 Chemical Peels, 2 HydraFacials, Skincare kit"
     }
-  ]
+  },
+  "booking_rules": {
+    "advance_notice": "24-48 hours recommended",
+    "cancellation_notice": "12 hours minimum",
+    "late_cancellation_fee": "50% of service fee",
+    "no_show_fee": "Full fee"
+  },
+  "conversation_hints": {
+    "service_keywords": {
+      "massage": "spa",
+      "haircut": "hair",
+      "hair color": "hair",
+      "skin": "dermatologist",
+      "diet": "nutritionist",
+      "weight": "nutritionist",
+      "yoga": "yoga",
+      "meditation": "meditation"
+    },
+    "time_keywords": {
+      "morning": ["7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM"],
+      "afternoon": ["12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"],
+      "evening": ["5:00 PM", "6:00 PM", "7:00 PM"]
+    },
+    "common_questions": {
+      "hours": "We're open Monday-Saturday 10 AM to 8 PM, Sunday 11 AM to 6 PM.",
+      "location": "Green Park, New Delhi",
+      "phone": "+91-11-4567-8900"
+    }
+  }
 }
