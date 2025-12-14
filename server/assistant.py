@@ -403,6 +403,30 @@ class VoiceAssistant:
                             logger.warning("⚠️ Detected 'let me check' without result, truncated")
                             break
         
+        # Check if booking confirmation says "with a doctor" or "with doctor" - should include actual doctor name
+        if "booked" in response_lower and ("with a doctor" in response_lower or "with doctor" in response_lower):
+            # Try to find doctor name from conversation history
+            doctor_keywords = ["dermatologist", "nutritionist", "ayurveda", "pain relief", "dr.", "doctor"]
+            doctor_names = {
+                "dermatologist": "Dr. Anjali Khanna",
+                "nutritionist": "Ms. Priya Sengupta",
+                "ayurveda": "Dr. Rajesh Kumar",
+                "pain relief": "Dr. Arvind Singh"
+            }
+            
+            # Search conversation history for doctor mentions
+            for msg in reversed(self.conversation_history[-5:]):  # Check last 5 messages
+                msg_content = msg.get("content", "").lower()
+                for keyword, doctor_name in doctor_names.items():
+                    if keyword in msg_content:
+                        # Replace "with a doctor" or "with doctor" with actual doctor name
+                        assistant_text = assistant_text.replace("with a doctor", f"with {doctor_name}")
+                        assistant_text = assistant_text.replace("with doctor", f"with {doctor_name}")
+                        logger.warning(f"⚠️ Replaced 'with doctor' with actual doctor name: {doctor_name}")
+                        break
+                if "dr." in assistant_text.lower() or any(name.split()[1].lower() in assistant_text.lower() for name in doctor_names.values()):
+                    break
+        
         # Add to history
         self.conversation_history.append({
             "role": "assistant",
