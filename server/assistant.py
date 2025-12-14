@@ -3,18 +3,16 @@ Voice Assistant - Main logic for handling conversations
 """
 
 import asyncio
-import os
 from loguru import logger
 from openai import OpenAI
 import requests
 import json
 
 from config.settings import config
-from config.prompts import get_demo_prompt, get_demo_greeting
+from config.prompts import get_system_prompt
 
 
-from server.knowledge_base import LevoWellnessDemoKB
-import re
+from server.knowledge_base import HealthcareKnowledgeBase
 
 class VoiceAssistant:
     """Complete voice assistant with direct Deepgram integration"""
@@ -27,15 +25,14 @@ class VoiceAssistant:
         self.openai_client = OpenAI(api_key=self.openai_config.api_key)
         
         # Load Knowledge Base
-        kb_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "knowledge_base.json")
-        self.kb = LevoWellnessDemoKB(data_path=kb_path)
+        self.kb = HealthcareKnowledgeBase()
         kb_context = self.kb.get_context_string()
 
         # Initialize conversation with healthcare persona + KB
         self.conversation_history = [
             {
                 "role": "system",
-                "content": get_demo_prompt(kb_context)
+                "content": get_system_prompt(kb_context)
             }
         ]
     
@@ -74,21 +71,6 @@ class VoiceAssistant:
         
         # Send ready to browser
         await websocket.send(json.dumps({'type': 'ready'}))
-        
-        # Send greeting message (only once on connection, not during conversations)
-        greeting = get_demo_greeting()
-        logger.info(f"👋 Sending greeting: {greeting}")
-        await websocket.send(json.dumps({
-            'type': 'greeting',
-            'text': greeting
-        }))
-        await self.text_to_speech(greeting, websocket)
-        
-        # Mark that greeting has been sent (add to conversation history so LLM knows)
-        self.conversation_history.append({
-            "role": "assistant",
-            "content": greeting
-        })
         
         try:
             async def forward_audio():
@@ -182,66 +164,10 @@ class VoiceAssistant:
         except Exception as e:
             logger.error(f"❌ LLM error: {e}")
     
-    def _chunk_text(self, text, max_chars=4000):
-        """
-        Split text into chunks at sentence boundaries.
-        ElevenLabs has a limit, so we chunk at sentences to preserve natural flow.
-        """
-        if len(text) <= max_chars:
-            return [text]
-        
-        chunks = []
-        # Split by sentence endings (., !, ?) followed by space or newline
-        sentences = re.split(r'([.!?]\s+)', text)
-        
-        current_chunk = ""
-        for i in range(0, len(sentences), 2):
-            sentence = sentences[i] + (sentences[i+1] if i+1 < len(sentences) else "")
-            
-            # If adding this sentence would exceed limit, save current chunk
-            if current_chunk and len(current_chunk) + len(sentence) > max_chars:
-                chunks.append(current_chunk.strip())
-                current_chunk = sentence
-            else:
-                current_chunk += sentence
-        
-        # Add remaining chunk
-        if current_chunk.strip():
-            chunks.append(current_chunk.strip())
-        
-        # If any chunk is still too long (shouldn't happen, but safety check)
-        final_chunks = []
-        for chunk in chunks:
-            if len(chunk) > max_chars:
-                # Force split at word boundaries
-                words = chunk.split()
-                temp_chunk = ""
-                for word in words:
-                    if len(temp_chunk) + len(word) + 1 > max_chars:
-                        if temp_chunk:
-                            final_chunks.append(temp_chunk.strip())
-                        temp_chunk = word
-                    else:
-                        temp_chunk += " " + word if temp_chunk else word
-                if temp_chunk:
-                    final_chunks.append(temp_chunk.strip())
-            else:
-                final_chunks.append(chunk)
-        
-        return final_chunks
-    
     async def text_to_speech(self, text, websocket):
-        """Convert text to speech using ElevenLabs with chunking for long texts"""
+        """Convert text to speech using ElevenLabs"""
         try:
-            text_length = len(text)
-            logger.info(f"🔊 Generating speech for text ({text_length} characters)...")
-            logger.info(f"📝 Full text: {text}")
-            
-            # Chunk text if it's too long (ElevenLabs limit is ~5000 chars, we use 4000 for safety)
-            chunks = self._chunk_text(text, max_chars=4000)
-            
-            if len(chunks) > 1:
-                logger.info(f"📝 Text split into {len(chunks)} chunks for TTS")
+            logger.info("🔊 Generating speech...")
             
             url = f"https://api.elevenlabs.io/v1/text-to-speech/{self.elevenlabs_config.voice_id}/stream"
             
@@ -251,54 +177,33 @@ class VoiceAssistant:
                 "xi-api-key": self.elevenlabs_config.api_key
             }
             
-            total_chunks_sent = 0
-            
-            # Process each chunk sequentially
-            for chunk_idx, chunk in enumerate(chunks):
-                logger.info(f"🔊 Processing chunk {chunk_idx + 1}/{len(chunks)} ({len(chunk)} chars)")
-                
-                data = {
-                    "text": chunk,
-                    "model_id": self.elevenlabs_config.model,
-                    "voice_settings": {
-                        "stability": self.elevenlabs_config.stability,
-                        "similarity_boost": self.elevenlabs_config.similarity_boost
-                    }
+            data = {
+                "text": text,
+                "model_id": self.elevenlabs_config.model,
+                "voice_settings": {
+                    "stability": self.elevenlabs_config.stability,
+                    "similarity_boost": self.elevenlabs_config.similarity_boost
                 }
+            }
+            
+            # Make request in thread pool to avoid blocking
+            loop = asyncio.get_event_loop()
+            response = await loop.run_in_executor(
+                None,
+                lambda: requests.post(url, json=data, headers=headers, stream=True)
+            )
+            
+            if response.status_code == 200:
+                # Stream audio to browser
+                chunk_count = 0
+                for chunk in response.iter_content(chunk_size=4096):
+                    if chunk:
+                        chunk_count += 1
+                        await websocket.send(chunk)
                 
-                # Make request in thread pool to avoid blocking
-                loop = asyncio.get_event_loop()
-                response = await loop.run_in_executor(
-                    None,
-                    lambda: requests.post(url, json=data, headers=headers, stream=True)
-                )
-                
-                if response.status_code == 200:
-                    # Stream audio to browser
-                    chunk_count = 0
-                    for audio_chunk in response.iter_content(chunk_size=4096):
-                        if audio_chunk:
-                            chunk_count += 1
-                            total_chunks_sent += 1
-                            await websocket.send(audio_chunk)
-                    
-                    logger.info(f"✅ Chunk {chunk_idx + 1} sent ({chunk_count} audio chunks)")
-                    
-                    # Small delay between chunks to ensure smooth playback
-                    if chunk_idx < len(chunks) - 1:
-                        await asyncio.sleep(0.1)
-                else:
-                    logger.error(f"❌ TTS error for chunk {chunk_idx + 1}: {response.status_code} - {response.text}")
-                    break
-            
-            logger.info(f"✅ Complete audio sent to browser ({total_chunks_sent} total audio chunks from {len(chunks)} text chunks)")
-            
-            # Small delay to ensure last audio chunk is fully sent before signaling completion
-            await asyncio.sleep(0.2)
-            
-            # Send completion signal to client
-            await websocket.send(json.dumps({'type': 'tts_complete'}))
-            logger.info("📢 TTS completion signal sent to client")
+                logger.info(f"✅ Audio sent to browser ({chunk_count} chunks)")
+            else:
+                logger.error(f"❌ TTS error: {response.status_code} - {response.text}")
                 
         except Exception as e:
             logger.error(f"❌ TTS error: {e}")
