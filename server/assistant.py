@@ -20,30 +20,48 @@ class VoiceAssistant:
     """Complete voice assistant with direct Deepgram integration"""
     
     def __init__(self):
+        logger.debug("🔧 Initializing VoiceAssistant")
+        
+        logger.debug("📋 Loading configuration")
         self.deepgram_config = config.deepgram
         self.openai_config = config.openai
         self.elevenlabs_config = config.elevenlabs
+        logger.debug(f"   Deepgram model: {self.deepgram_config.model}")
+        logger.debug(f"   OpenAI model: {self.openai_config.model}")
+        logger.debug(f"   ElevenLabs voice_id: {self.elevenlabs_config.voice_id}")
         
+        logger.debug("🔌 Initializing OpenAI client")
         self.openai_client = OpenAI(api_key=self.openai_config.api_key)
+        logger.debug("✅ OpenAI client initialized")
         
         # Load Knowledge Base
         kb_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "knowledge_base.json")
+        logger.debug(f"📚 Loading knowledge base from: {kb_path}")
         self.kb = LevoWellnessDemoKB(data_path=kb_path)
         kb_context = self.kb.get_context_string()
+        logger.debug(f"✅ Knowledge base loaded, context length: {len(kb_context)} chars")
 
         # Initialize conversation with healthcare persona + KB
+        logger.debug("💬 Initializing conversation history with system prompt")
+        system_prompt = get_demo_prompt(kb_context)
         self.conversation_history = [
             {
                 "role": "system",
-                "content": get_demo_prompt(kb_context)
+                "content": system_prompt
             }
         ]
+        logger.debug(f"✅ System prompt initialized, length: {len(system_prompt)} chars")
+        logger.debug("✅ VoiceAssistant initialization complete")
     
     async def handle_client(self, websocket):
         """Handle a browser client connection"""
-        logger.info(f"🎙️  Client connected: {websocket.remote_address}")
+        client_addr = websocket.remote_address
+        logger.info(f"🎙️  Client connected: {client_addr}")
+        logger.debug(f"   Client address: {client_addr}")
+        logger.debug(f"   WebSocket state: {websocket.state}")
         
         # Build Deepgram URL using config values
+        logger.debug("🔗 Building Deepgram WebSocket URL")
         deepgram_url = (
             f"wss://api.deepgram.com/v1/listen"
             f"?encoding={self.deepgram_config.encoding}"
@@ -56,164 +74,256 @@ class VoiceAssistant:
             f"&smart_format={str(self.deepgram_config.smart_format).lower()}"
             f"&numerals={str(self.deepgram_config.numerals).lower()}"
         )
+        logger.debug(f"   Deepgram URL: {deepgram_url.split('?')[0]}... (params configured)")
+        logger.debug(f"   Parameters: model={self.deepgram_config.model}, language={self.deepgram_config.language}, sample_rate={self.deepgram_config.sample_rate}")
         
         logger.info("🔌 Connecting to Deepgram...")
         
         try:
             # Connect to Deepgram - exact copy from working version
             import websockets.legacy.client as client
+            logger.debug("   Creating WebSocket connection to Deepgram")
             dg_ws = await client.connect(
                 deepgram_url,
                 extra_headers=[("Authorization", f"Token {self.deepgram_config.api_key}")]
             )
             logger.info("✅ Connected to Deepgram")
+            logger.debug(f"   Deepgram WebSocket state: {dg_ws.state}")
             
         except Exception as e:
             logger.error(f"❌ Deepgram connection failed: {e}")
+            logger.exception("   Full exception traceback:")
             return
         
         # Send ready to browser
+        logger.debug("📤 Sending 'ready' message to client")
         await websocket.send(json.dumps({'type': 'ready'}))
+        logger.debug("✅ 'ready' message sent")
         
         # Flag to track if greeting has been sent (after first user message)
         greeting_sent = False
+        logger.debug("🔧 Initialized greeting_sent flag: False")
         
         try:
             async def forward_audio():
                 """Forward audio from browser to Deepgram"""
+                logger.debug("🔄 Starting audio forwarding task")
                 audio_count = 0
+                total_bytes = 0
+                
                 async for message in websocket:
                     if isinstance(message, bytes):
                         audio_count += 1
+                        total_bytes += len(message)
                         if audio_count == 1:
                             logger.info(f"📤 First audio chunk: {len(message)} bytes")
+                            logger.debug(f"   First chunk size: {len(message)} bytes")
                         if audio_count % 50 == 0:
                             logger.info(f"📤 {audio_count} audio chunks")
+                            logger.debug(f"   Total audio bytes forwarded: {total_bytes}")
                         await dg_ws.send(message)
                     elif isinstance(message, str):
+                        logger.debug(f"📥 Received text message from client: {message[:100]}")
                         data = json.loads(message)
+                        logger.debug(f"   Parsed message type: {data.get('type')}")
                         if data.get('type') == 'stop':
+                            logger.info("🛑 Received 'stop' signal from client")
+                            logger.debug("   Stopping audio forwarding")
                             break
+                logger.debug(f"✅ Audio forwarding task completed (total chunks: {audio_count}, total bytes: {total_bytes})")
             
             async def process_transcriptions():
                 """Process transcriptions from Deepgram"""
                 nonlocal greeting_sent
+                logger.debug("🔄 Starting transcription processing task")
+                transcription_count = 0
+                
                 async for message in dg_ws:
-                    data = json.loads(message)
+                    logger.debug(f"📥 Received message from Deepgram: {len(message)} chars")
+                    try:
+                        data = json.loads(message)
+                        logger.debug(f"   Parsed Deepgram response, keys: {list(data.keys())}")
+                    except json.JSONDecodeError as e:
+                        logger.error(f"❌ Failed to parse Deepgram message as JSON: {e}")
+                        logger.debug(f"   Raw message: {message[:200]}")
+                        continue
                     
                     if 'channel' in data and 'alternatives' in data['channel']:
                         alternatives = data['channel']['alternatives']
+                        logger.debug(f"   Found {len(alternatives)} alternatives")
                         if alternatives and len(alternatives) > 0:
                             transcript = alternatives[0].get('transcript', '')
                             is_final = data.get('is_final', False)
+                            confidence = alternatives[0].get('confidence', 0)
+                            logger.debug(f"   Transcript: '{transcript}', is_final: {is_final}, confidence: {confidence}")
                             
                             if transcript and is_final:
+                                transcription_count += 1
                                 logger.info(f"🎤 USER: {transcript}")
+                                logger.debug(f"   Final transcription #{transcription_count}: '{transcript}'")
                                 
                                 # Send transcription to browser
+                                logger.debug("📤 Sending transcription to client")
                                 await websocket.send(json.dumps({
                                     'type': 'transcription',
                                     'text': transcript
                                 }))
+                                logger.debug("✅ Transcription sent to client")
                                 
                                 # Send greeting after first user message (only once)
                                 if not greeting_sent:
+                                    logger.debug("👋 First user message detected, preparing greeting")
                                     greeting = self.kb.get_greeting(mode="voice_nano")
                                     logger.info(f"👋 Sending greeting after first message: {greeting}")
+                                    logger.debug(f"   Greeting text: '{greeting}'")
+                                    
+                                    logger.debug("📤 Sending greeting message to client")
                                     await websocket.send(json.dumps({
                                         'type': 'greeting',
                                         'text': greeting
                                     }))
+                                    logger.debug("✅ Greeting message sent")
                                     
                                     # Add greeting to conversation history BEFORE user message
                                     # This helps LLM understand the greeting was already sent
+                                    logger.debug("💬 Adding greeting to conversation history")
                                     self.conversation_history.append({
                                         "role": "assistant",
                                         "content": greeting
                                     })
+                                    logger.debug(f"   Conversation history length: {len(self.conversation_history)}")
                                     
                                     # Add user message to history
+                                    logger.debug("💬 Adding user message to conversation history")
                                     self.conversation_history.append({
                                         "role": "user",
                                         "content": transcript
                                     })
+                                    logger.debug(f"   Conversation history length: {len(self.conversation_history)}")
                                     
                                     # Add explicit instruction to NOT ask another question
+                                    logger.debug("💬 Adding system reminder to conversation history")
                                     self.conversation_history.append({
                                         "role": "system",
                                         "content": "REMINDER: The greeting already asked 'How can I help you today?' DO NOT ask 'How can I assist you today?' or any similar question. Just acknowledge and wait, or answer if the user has a specific request."
                                     })
+                                    logger.debug(f"   Conversation history length: {len(self.conversation_history)}")
                                     
                                     greeting_sent = True
+                                    logger.debug("✅ Greeting sent flag set to True")
                                     
                                     # Send greeting TTS and wait for it to complete
+                                    logger.debug("🔊 Starting greeting TTS generation")
                                     await self.text_to_speech(greeting, websocket)
+                                    logger.debug("✅ Greeting TTS completed")
                                     
                                     # Estimate greeting audio duration and wait for it to complete
                                     word_count = len(greeting.split())
                                     estimated_duration = (word_count / 2.5) + 1.0  # seconds
                                     logger.info(f"⏳ Waiting {estimated_duration:.1f}s for greeting audio to complete...")
+                                    logger.debug(f"   Word count: {word_count}, estimated duration: {estimated_duration:.1f}s")
                                     await asyncio.sleep(estimated_duration)
+                                    logger.debug("✅ Waiting period completed")
                                     
                                     # Get LLM response (user message already added to history)
+                                    logger.debug("🧠 Getting LLM response (direct)")
                                     await self.get_llm_response_direct(websocket)
+                                    logger.debug("✅ LLM response completed")
                                 else:
+                                    logger.debug("💬 Processing subsequent user message")
                                     # Get LLM response (user message will be added inside this function)
                                     await self.get_llm_response(transcript, websocket)
+                                    logger.debug("✅ User message processing completed")
             
             # Run both tasks
+            logger.debug("🚀 Starting parallel tasks: audio forwarding and transcription processing")
             await asyncio.gather(
                 forward_audio(),
                 process_transcriptions()
             )
+            logger.debug("✅ Both tasks completed")
             
         except Exception as e:
             logger.error(f"❌ Session error: {e}")
+            logger.exception("   Full exception traceback:")
         finally:
-            await dg_ws.close()
+            logger.debug("🧹 Cleaning up session")
+            try:
+                await dg_ws.close()
+                logger.debug("✅ Deepgram WebSocket closed")
+            except Exception as e:
+                logger.error(f"❌ Error closing Deepgram connection: {e}")
             logger.info("✅ Session complete")
     
     async def get_llm_response(self, user_text, websocket):
         """Get response from OpenAI"""
+        logger.debug(f"💬 get_llm_response called with user text: '{user_text}'")
         try:
             # Add user message
+            logger.debug("💬 Adding user message to conversation history")
             self.conversation_history.append({
                 "role": "user",
                 "content": user_text
             })
+            logger.debug(f"   Conversation history length: {len(self.conversation_history)}")
             
             await self._process_llm_response(websocket)
             
         except Exception as e:
             logger.error(f"❌ LLM error: {e}")
+            logger.exception("   Full exception traceback:")
     
     async def get_llm_response_direct(self, websocket):
         """Get LLM response when user message already in history"""
+        logger.debug("💬 get_llm_response_direct called (user message already in history)")
+        logger.debug(f"   Conversation history length: {len(self.conversation_history)}")
         try:
             await self._process_llm_response(websocket)
         except Exception as e:
             logger.error(f"❌ LLM error: {e}")
+            logger.exception("   Full exception traceback:")
     
     async def _process_llm_response(self, websocket):
         """Process LLM response (shared logic)"""
         logger.info("🧠 Calling OpenAI...")
+        logger.debug(f"   Model: {self.openai_config.model}")
+        logger.debug(f"   Max tokens: {self.openai_config.max_tokens}")
+        logger.debug(f"   Temperature: {self.openai_config.temperature}")
+        logger.debug(f"   Full conversation history length: {len(self.conversation_history)}")
         
         # Filter out additional system messages from history (keep only the first one)
         filtered_history = [self.conversation_history[0]]  # Keep initial system prompt
+        skipped_system_messages = 0
         for msg in self.conversation_history[1:]:
             if msg["role"] != "system":  # Skip additional system reminder messages
                 filtered_history.append(msg)
+            else:
+                skipped_system_messages += 1
+        logger.debug(f"   Filtered history length: {len(filtered_history)} (skipped {skipped_system_messages} system messages)")
+        logger.debug(f"   Last user message: {filtered_history[-1].get('content', '')[:100] if filtered_history and filtered_history[-1].get('role') == 'user' else 'N/A'}")
         
         # Get response
-        response = self.openai_client.chat.completions.create(
-            model=self.openai_config.model,
-            messages=filtered_history,
-            max_tokens=self.openai_config.max_tokens,
-            temperature=self.openai_config.temperature
-        )
+        logger.debug("   Sending request to OpenAI API")
+        try:
+            response = self.openai_client.chat.completions.create(
+                model=self.openai_config.model,
+                messages=filtered_history,
+                max_tokens=self.openai_config.max_tokens,
+                temperature=self.openai_config.temperature
+            )
+            logger.debug(f"   OpenAI API response received")
+            logger.debug(f"   Response choices: {len(response.choices)}")
+            logger.debug(f"   Usage: {response.usage}")
+            
+            assistant_text = response.choices[0].message.content
+            logger.info(f"💬 ASSISTANT: {assistant_text}")
+            logger.debug(f"   Response text length: {len(assistant_text)} chars")
+        except Exception as e:
+            logger.error(f"❌ OpenAI API call failed: {e}")
+            logger.exception("   Full exception traceback:")
+            raise
         
-        assistant_text = response.choices[0].message.content
-        logger.info(f"💬 ASSISTANT: {assistant_text}")
+        logger.debug("🔍 Processing LLM response text for filtering")
         
         # Check if response is asking redundant question after greeting
         redundant_phrases = [
@@ -228,17 +338,21 @@ class VoiceAssistant:
             "assist in booking"
         ]
         response_lower = assistant_text.lower()
+        logger.debug(f"   Original response: '{assistant_text}'")
         # Check if it contains redundant phrases (especially after greeting)
         # If it mentions helping or asking what user wants, it's likely redundant
         if any(phrase in response_lower for phrase in redundant_phrases):
+            logger.debug("   Detected redundant phrase in response")
             # If it's a question, replace with simple acknowledgment - NO question
             if "?" in assistant_text:
                 assistant_text = "I'm here to help."
                 logger.warning("⚠️ Detected redundant question, replacing with simple acknowledgment")
+                logger.debug(f"   Replaced with: '{assistant_text}'")
             # If it's a statement like "I can help you with...", also replace
             elif "i can help" in response_lower or "i can assist" in response_lower:
                 assistant_text = "I'm here to help."
                 logger.warning("⚠️ Detected redundant help statement, replacing with simple acknowledgment")
+                logger.debug(f"   Replaced with: '{assistant_text}'")
         
         # Check for "hold on" or "wait" phrases - AI should respond immediately, not ask user to wait
         delay_phrases = [
@@ -510,27 +624,38 @@ class VoiceAssistant:
                         )
                         logger.warning(f"⚠️ Added department to existing doctor name: {doctor_with_dept}")
         
+        logger.debug("💬 Adding assistant response to conversation history")
         # Add to history
         self.conversation_history.append({
             "role": "assistant",
             "content": assistant_text
         })
+        logger.debug(f"   Conversation history length: {len(self.conversation_history)}")
         
         # Send to browser
+        logger.debug("📤 Sending LLM response text to client")
         await websocket.send(json.dumps({
             'type': 'llm_text',
             'text': assistant_text
         }))
+        logger.debug("✅ LLM response text sent to client")
         
         # Generate speech
+        logger.debug("🔊 Starting text-to-speech generation")
         await self.text_to_speech(assistant_text, websocket)
+        logger.debug("✅ Text-to-speech generation completed")
     
     async def text_to_speech(self, text, websocket):
         """Convert text to speech using ElevenLabs"""
+        logger.debug(f"🔊 text_to_speech called with text: '{text}'")
+        logger.debug(f"   Text length: {len(text)} chars")
         try:
             logger.info("🔊 Generating speech...")
             
             url = f"https://api.elevenlabs.io/v1/text-to-speech/{self.elevenlabs_config.voice_id}/stream"
+            logger.debug(f"   TTS URL: {url.split('/stream')[0]}...")
+            logger.debug(f"   Voice ID: {self.elevenlabs_config.voice_id}")
+            logger.debug(f"   Model: {self.elevenlabs_config.model}")
             
             headers = {
                 "Accept": "audio/mpeg",
@@ -546,32 +671,46 @@ class VoiceAssistant:
                     "similarity_boost": self.elevenlabs_config.similarity_boost
                 }
             }
+            logger.debug(f"   Voice settings: stability={self.elevenlabs_config.stability}, similarity_boost={self.elevenlabs_config.similarity_boost}")
             
             # Make request in thread pool to avoid blocking
+            logger.debug("   Sending request to ElevenLabs API (in thread pool)")
             loop = asyncio.get_event_loop()
             response = await loop.run_in_executor(
                 None,
                 lambda: requests.post(url, json=data, headers=headers, stream=True)
             )
+            logger.debug(f"   ElevenLabs API response status: {response.status_code}")
             
             if response.status_code == 200:
+                logger.debug("   ✅ ElevenLabs API request successful, streaming audio")
                 # Stream audio to browser
                 chunk_count = 0
+                total_bytes = 0
                 for chunk in response.iter_content(chunk_size=4096):
                     if chunk:
                         chunk_count += 1
+                        total_bytes += len(chunk)
                         await websocket.send(chunk)
+                        if chunk_count % 10 == 0:
+                            logger.debug(f"   Sent {chunk_count} audio chunks ({total_bytes} bytes)")
                 
                 logger.info(f"✅ Audio sent to browser ({chunk_count} chunks)")
+                logger.debug(f"   Total audio bytes sent: {total_bytes}")
                 
                 # Small delay to ensure last audio chunk is fully sent
+                logger.debug("   Waiting 200ms to ensure last chunk is sent")
                 await asyncio.sleep(0.2)
                 
                 # Send completion signal to client
+                logger.debug("📤 Sending TTS completion signal to client")
                 await websocket.send(json.dumps({'type': 'tts_complete'}))
                 logger.info("📢 TTS completion signal sent to client")
+                logger.debug("✅ Text-to-speech process completed successfully")
             else:
                 logger.error(f"❌ TTS error: {response.status_code} - {response.text}")
+                logger.debug(f"   Response headers: {dict(response.headers)}")
                 
         except Exception as e:
             logger.error(f"❌ TTS error: {e}")
+            logger.exception("   Full exception traceback:")
