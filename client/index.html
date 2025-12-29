@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HealthCare Plus - AI Assistant</title>
+    <title>Levo Wellness Center - AI Assistant</title>
     <style>
         :root {
             --primary: #6366f1;
@@ -492,7 +492,7 @@
 
     <div class="container">
         <div class="header">
-            <h1><span>🏥</span> HealthCare Plus</h1>
+            <h1><span>🏥</span> Levo Wellness Center</h1>
             <p>AI-Powered Voice Assistant</p>
         </div>
 
@@ -713,7 +713,7 @@
                 // 1. Localhost: Defaults to ws://localhost:8765
                 // 2. Production: AWS Amplify will replace '__WEBSOCKET_URL__' with the real URL via 'sed'
 
-                let wsUrl = 'wss://veterinary-buildings-voip-limiting.trycloudflare.com';
+                let wsUrl = 'wss://order-bedrooms-highlighted-alot.trycloudflare.com';
 
                 // If the placeholder wasn't replaced (running locally), default to localhost
                 if (wsUrl === '__WEBSOCKET_URL__' || wsUrl.includes('WEBSOCKET_URL')) {
@@ -740,10 +740,27 @@
             } else if (typeof e.data === 'string') {
                 const d = JSON.parse(e.data);
                 if (d.type === 'transcription') addMsg('You', d.text, 'user');
-                else if (d.type === 'llm_text') {
+                else if (d.type === 'greeting') {
+                    // Greeting is sent after first user message, display it in UI
+                    addMsg('AI', d.text, 'ai');
+                    // For long texts, wait a bit longer for audio chunks to arrive
+                    if (d.text && d.text.length > 500) {
+                        clearTimeout(window.playTimer);
+                        window.playTimer = setTimeout(playAudio, 500);
+                    }
+                } else if (d.type === 'llm_text') {
                     addMsg('AI', d.text, 'ai');
                     state.stats.convs++;
                     els.convCount.textContent = state.stats.convs;
+                    // For long texts, wait a bit longer for audio chunks to arrive
+                    if (d.text && d.text.length > 500) {
+                        clearTimeout(window.playTimer);
+                        window.playTimer = setTimeout(playAudio, 500);
+                    }
+                } else if (d.type === 'tts_complete') {
+                    // Signal that all TTS chunks have been sent
+                    clearTimeout(window.playTimer);
+                    window.playTimer = setTimeout(playAudio, 200);
                 }
             }
         }
